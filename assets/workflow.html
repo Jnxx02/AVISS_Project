@@ -24,6 +24,11 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        /* Hexagon Clip Paths */
+        .hex-shape {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
         .chart-container {
             position: relative;
             width: 100%;
@@ -121,6 +126,34 @@
             flex-wrap: wrap; 
             justify-content: center;
         }
+
+        /* Tooltip styling for clickable hexagons */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip-container .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #334155;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 100;
+            bottom: 105%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            pointer-events: none;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -144,24 +177,219 @@
 
     <div id="app-container">
         
-        <header class="pt-32 pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
-            <div class="inline-block bg-teal-50 text-teal-700 border border-teal-200 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
-                Laporan Skripsi Interaktif
+        <!-- HERO SECTION DENGAN HEXAGON GRID BARU -->
+        <header class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative overflow-hidden">
+            <div class="inline-block bg-teal-50 text-teal-700 border border-teal-200 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
+                A-VISS
             </div>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-6 tracking-tight">
-                Klasifikasi Stres Perawat Menggunakan Pendekatan <span class="text-teal-700">Subject-Dependent CNN-LSTM</span>
+            
+            <!-- Judul Utama yang Lebih Akademis & Kuat -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-3 tracking-tighter">
+                AI-Powered Nurse Stress Monitoring System
             </h1>
-            <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-3xl mx-auto">
-                Rancang bangun purwarupa <b>A-VISS (Adaptive Virtual ICU Support System)</b>. Implementasi <i>Deep Learning</i> ke dalam <i>dashboard</i> sistem informasi guna membantu mengurangi insiden <i>alarm fatigue</i> melalui standardisasi <i>baseline</i> fisiologis individu.
+            <h2 class="text-lg md:text-2xl font-bold text-teal-700 tracking-wide mb-6">
+                A-VISS (Automated Vital Intelligence for Stress Surveillance)
+            </h2>
+
+            <p class="text-md md:text-lg text-slate-600 leading-relaxed mb-8 max-w-3xl mx-auto">
+                Rancang bangun purwarupa <b>A-VISS</b>. Implementasi <i>Deep Learning</i> ke dalam <i>dashboard</i> sistem informasi guna membantu mengurangi insiden <i>alarm fatigue</i>.
             </p>
-            <div class="text-sm text-slate-500 mb-8 font-medium">Oleh: Jonathan Kwan (H071221067)</div>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#metodologi" class="bg-white text-slate-700 border border-slate-300 px-6 py-3 rounded-xl hover:bg-slate-50 transition font-semibold shadow-sm">Lihat Metodologi AI</a>
-                <a href="#simulasi" class="bg-teal-700 text-white px-6 py-3 rounded-xl hover:bg-teal-800 transition font-semibold shadow-lg shadow-teal-900/20">Coba Prototype Dashboard</a>
+
+            <!-- HEXAGON GRID: KONTEN VISUAL PENELITIAN -->
+            <div class="flex justify-center mt-4 h-[400px] md:h-[520px]">
+                <div class="relative w-[600px] h-[700px] transform scale-[0.55] md:scale-[0.74] origin-top">                    
+                    <!-- SVG Alur Koneksi di Latar Belakang -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
+                        <defs>
+                           <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                               <polygon points="0 0, 6 3, 0 6" fill="#94a3b8" />
+                           </marker>
+                        </defs>
+                        <!-- Wearable -> Dataset -->
+                        <path d="M 300 421 L 120 278" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#arrowhead)"/>
+                        <!-- Dataset -> Sliding Window -->
+                        <path d="M 120 278 L 120 564" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#arrowhead)"/>
+                        <!-- Sliding Window -> CNN-LSTM -->
+                        <path d="M 120 564 L 300 135" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#arrowhead)"/>
+                        <!-- CNN-LSTM -> Dashboard -->
+                        <path d="M 300 135 L 480 278" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#arrowhead)"/>
+                        <!-- Dashboard -> Visualisasi -->
+                        <path d="M 480 278 L 480 564" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6" fill="none" marker-end="url(#arrowhead)"/>
+                    </svg>
+
+                    <!-- Hexagon Kiri Atas (120, 278): Dataset -->
+                    <div class="absolute left-0 top-[143px] z-10 w-[240px]">
+                        <div class="tooltip-container filter drop-shadow-md hover:drop-shadow-2xl transition-all duration-300 hover:scale-105 hover:z-50 cursor-pointer w-full" onclick="downloadFigure('hex-target-2', 'Hexagon_Dataset')">
+                            <span class="tooltip-text">Download Gambar</span>
+                            <div id="hex-target-2" class="hex-shape w-[240px] h-[270px] bg-slate-200 flex items-center justify-center">
+                                <div class="hex-shape w-[236px] h-[266px] bg-white flex flex-col items-center justify-center p-4">
+                                    <div class="text-slate-700 font-bold text-lg mb-2 border-b-2 border-slate-200 pb-1 w-full text-center">Dataset</div>
+                                    <div class="w-full flex-grow flex items-center justify-center mt-2">
+                                        <div class="w-24 h-24 bg-slate-50 rounded-full border-4 border-slate-200 flex flex-col items-center justify-center shadow-sm relative group">
+                                            <svg class="w-10 h-10 text-slate-400 mb-1 group-hover:text-teal-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                                            <div class="absolute -right-2 -top-1 bg-teal-100 text-teal-700 text-[9px] font-black px-2 py-0.5 rounded-full border border-teal-200 shadow-sm">CSV</div>
+                                            <div class="flex gap-1">
+                                                <div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div>
+                                                <div class="w-1.5 h-1.5 rounded-full bg-sky-400"></div>
+                                                <div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hexagon Kiri Bawah (120, 564): Sliding Window -->
+                    <div class="absolute left-0 top-[429px] z-10 w-[240px]">
+                        <div class="tooltip-container filter drop-shadow-md hover:drop-shadow-2xl transition-all duration-300 hover:scale-105 hover:z-50 cursor-pointer w-full" onclick="downloadFigure('hex-target-5', 'Hexagon_SlidingWindow')">
+                            <span class="tooltip-text">Download Gambar</span>
+                            <div id="hex-target-5" class="hex-shape w-[240px] h-[270px] bg-slate-200 flex items-center justify-center">
+                                <div class="hex-shape w-[236px] h-[266px] bg-white flex flex-col items-center justify-center p-6">
+                                    <div class="text-slate-700 font-bold text-lg mb-2 text-center border-b-2 border-slate-200 pb-1 w-full leading-tight">Sliding Window</div>
+                                    <div class="w-full flex-grow flex items-center justify-center mt-2">
+                                        <div class="relative w-32 h-20 flex items-center justify-center group">
+                                            <div class="absolute left-0 w-16 h-12 border-2 border-slate-200 rounded-lg bg-slate-50 opacity-60"></div>
+                                            <div class="absolute left-4 top-2 w-16 h-12 border-2 border-slate-300 rounded-lg bg-slate-100 opacity-80"></div>
+                                            <div class="absolute left-8 top-4 w-16 h-12 border-2 border-sky-400 rounded-lg bg-sky-50 shadow-md z-10 flex items-center justify-center transition-transform group-hover:translate-x-2">
+                                                <svg class="w-6 h-6 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hexagon Tengah Atas (300, 135): CNN-LSTM -->
+                    <div class="absolute left-[180px] top-0 z-20 w-[240px]">
+                        <div class="tooltip-container filter drop-shadow-lg hover:drop-shadow-2xl transition-all duration-300 hover:scale-105 hover:z-50 cursor-pointer w-full" onclick="downloadFigure('hex-target-1', 'Hexagon_CNN_LSTM')">
+                            <span class="tooltip-text">Download Gambar</span>
+                            <div id="hex-target-1" class="hex-shape w-[240px] h-[270px] bg-slate-200 flex items-center justify-center">
+                                <div class="hex-shape w-[236px] h-[266px] bg-white flex flex-col items-center justify-center p-4">
+                                    <div class="text-teal-800 font-black text-lg mb-3 uppercase tracking-widest border-b-2 border-teal-500 pb-1 w-full text-center">CNN-LSTM</div>
+                                    <div class="w-full flex-grow flex items-center justify-center mt-2">
+                                        <div class="w-24 h-24 bg-white rounded-2xl border-4 border-teal-100 flex items-center justify-center shadow-lg relative transform rotate-3 hover:rotate-0 transition">
+                                            <div class="absolute inset-2 border-2 border-dashed border-teal-200 rounded-xl"></div>
+                                            <svg class="w-12 h-12 text-teal-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                            <div class="absolute -bottom-3 text-[9px] bg-indigo-100 text-indigo-700 font-black px-3 py-1 rounded-full border border-indigo-200 shadow-sm">AI MODEL</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hexagon Tengah Bawah (300, 421): Wearable Sensor -->
+                    <div class="absolute left-[180px] top-[286px] z-20 w-[240px]">
+                        <div class="tooltip-container filter drop-shadow-md hover:drop-shadow-2xl transition-all duration-300 hover:scale-105 hover:z-50 cursor-pointer w-full" onclick="downloadFigure('hex-target-4', 'Hexagon_WearableSensor')">
+                            <span class="tooltip-text">Download Gambar</span>
+                            <div id="hex-target-4" class="hex-shape w-[240px] h-[270px] bg-slate-200 flex items-center justify-center">
+                                <div class="hex-shape w-[236px] h-[266px] bg-white flex flex-col items-center justify-center p-4">
+                                    <div class="text-slate-700 font-bold text-lg mb-2 text-center border-b-2 border-slate-200 pb-1 w-full leading-tight">Wearable Sensor</div>
+                                    <div class="w-full flex-grow flex items-center justify-center mt-2">
+                                        <div class="w-16 h-24 bg-slate-800 rounded-3xl border-4 border-slate-300 flex items-center justify-center shadow-lg relative group">
+                                            <div class="absolute top-1 w-8 h-1 bg-slate-600 rounded-full"></div>
+                                            <div class="w-12 h-12 bg-black rounded-full border-2 border-slate-600 flex items-center justify-center relative overflow-hidden">
+                                                <svg class="w-6 h-6 text-emerald-400 absolute animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                            </div>
+                                            <div class="absolute bottom-1 w-8 h-1 bg-slate-600 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hexagon Kanan Atas (480, 278): Dashboard -->
+                    <div class="absolute left-[360px] top-[143px] z-10 w-[240px]">
+                        <div class="tooltip-container filter drop-shadow-md hover:drop-shadow-2xl transition-all duration-300 hover:scale-105 hover:z-50 cursor-pointer w-full" onclick="downloadFigure('hex-target-3', 'Hexagon_Dashboard')">
+                            <span class="tooltip-text">Download Gambar</span>
+                            <div id="hex-target-3" class="hex-shape w-[240px] h-[270px] bg-slate-200 flex items-center justify-center">
+                                <div class="hex-shape w-[236px] h-[266px] bg-white flex flex-col items-center justify-center p-6">
+                                    <div class="text-slate-700 font-bold text-lg mb-2 text-center border-b-2 border-slate-200 pb-1 w-full leading-tight">Dashboard A-VISS</div>
+                                    <!-- Dashboard Mockup Image -->
+                                    <div class="w-full h-24 border border-slate-300 rounded overflow-hidden flex shadow-inner relative bg-slate-100 items-center justify-center">
+                                        <img src="dashboard-preview.png" alt="Dashboard Preview" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span class="text-[10px] text-slate-400 absolute hidden font-mono">dashboard-preview.png</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hexagon Kanan Bawah (480, 564): Visualisasi -->
+                    <div class="absolute left-[360px] top-[429px] z-10 w-[240px]">
+                        <div class="tooltip-container filter drop-shadow-md hover:drop-shadow-2xl transition-all duration-300 hover:scale-105 hover:z-50 cursor-pointer w-full" onclick="downloadFigure('hex-target-6', 'Hexagon_Visualisasi')">
+                            <span class="tooltip-text">Download Gambar</span>
+                            <div id="hex-target-6" class="hex-shape w-[240px] h-[270px] bg-slate-200 flex items-center justify-center">
+                                <div class="hex-shape w-[236px] h-[266px] bg-white flex flex-col items-center justify-center p-5">
+                                    <div class="text-slate-700 font-bold text-lg mb-2 text-center border-b-2 border-slate-200 pb-1 w-full leading-tight">Visualisasi Sinyal</div>
+                                    <div class="w-full flex-grow border border-slate-300 rounded overflow-hidden flex shadow-inner relative bg-slate-100 items-center justify-center mt-2">
+                                        <img src="visualisasi-sinyal-logo.png" alt="Visualisasi Sinyal Logo" class="w-full h-full object-contain p-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span class="text-[10px] text-slate-400 absolute hidden font-mono text-center">visualisasi-sinyal-logo.png<br>(Mockup)</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
+            
         </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-24">
+
+            <!-- KPI Cards Section -->
+            <section class="grid md:grid-cols-4 gap-6 mt-16">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="text-3xl font-black text-teal-700 mb-1">89%</div>
+                    <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">Accuracy</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="text-3xl font-black text-teal-700 mb-1">CNN-LSTM</div>
+                    <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">Model</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="text-3xl font-black text-teal-700 mb-1">6</div>
+                    <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">Features</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="text-3xl font-black text-teal-700 mb-1">60s</div>
+                    <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">Window</div>
+                </div>
+            </section>
+
+            <!-- Why A-VISS Section -->
+            <section id="why-aviss" class="scroll-mt-24">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Why A-VISS?</h2>
+                </div>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-4xl mb-4">🔕</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Alarm Fatigue</h3>
+                        <p class="text-sm text-slate-600">Mengurangi peringatan palsu yang memicu penurunan kewaspadaan pada tenaga medis.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-4xl mb-4">📈</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Variabilitas Fisiologis</h3>
+                        <p class="text-sm text-slate-600">Kalibrasi model secara individual (Subject-Dependent) untuk akurasi yang lebih presisi.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-4xl mb-4">🧠</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Deep Learning Monitoring</h3>
+                        <p class="text-sm text-slate-600">Menggunakan arsitektur CNN-LSTM mutakhir untuk analisis seri waktu biologis yang kompleks.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-4xl mb-4">💻</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Real-Time Dashboard</h3>
+                        <p class="text-sm text-slate-600">Antarmuka interaktif yang menyajikan wawasan prediktif dan sinyal fisiologis tanpa jeda.</p>
+                    </div>
+                </div>
+            </section>
 
             <section id="konteks" class="scroll-mt-24">
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
@@ -198,64 +426,54 @@
                 </div>
             </section>
 
+            <section id="dataset" class="scroll-mt-24">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Dataset Profil</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto text-sm">
+                        Data mentah sekunder yang menjadi landasan pengembangan purwarupa sistem.
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row">
+                    <div class="md:w-1/3 bg-slate-50 p-8 border-r border-slate-100 flex flex-col justify-center">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sumber Data</div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">Nurse Stress Prediction Wearable Sensors</h3>
+                        <a href="#" class="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold text-sm transition">
+                            <span>Kaggle Dataset</span> <span class="text-lg">↗</span>
+                        </a>
+                    </div>
+                    <div class="md:w-2/3 p-8 flex flex-col sm:flex-row gap-8">
+                        <div class="flex-1">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Fitur Sensor (Features)</div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-slate-50 border border-slate-200 p-2 rounded text-center text-sm font-semibold text-slate-700">HR</div>
+                                <div class="bg-slate-50 border border-slate-200 p-2 rounded text-center text-sm font-semibold text-slate-700">EDA</div>
+                                <div class="bg-slate-50 border border-slate-200 p-2 rounded text-center text-sm font-semibold text-slate-700">TEMP</div>
+                                <div class="bg-slate-50 border border-slate-200 p-2 rounded text-center text-sm font-semibold text-slate-700">ACC X</div>
+                                <div class="bg-slate-50 border border-slate-200 p-2 rounded text-center text-sm font-semibold text-slate-700">ACC Y</div>
+                                <div class="bg-slate-50 border border-slate-200 p-2 rounded text-center text-sm font-semibold text-slate-700">ACC Z</div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Kelas Target (Labels)</div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                    <span class="text-sm font-bold text-slate-700">Normal (0)</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                                    <span class="text-sm font-bold text-slate-700">High Stress (1)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section id="metodologi" class="scroll-mt-24">
                 <h2 class="text-2xl font-bold text-slate-900 mb-2">Metodologi & Pipeline Model AI</h2>
                 <p class="text-slate-600 mb-8">Eksplorasi alur komputasi dari dataset mentah hingga evaluasi akhir model. Seluruh diagram arsitektur dapat diunduh pada <a href="#lampiran-ekspor" class="text-teal-600 hover:underline">Seksi Lampiran</a>.</p>
-
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm mb-10">
-                    <div id="export-target-1" class="figure-content bg-white p-8 rounded-xl flex flex-col items-center min-w-[300px] overflow-x-auto shadow-sm border border-slate-100 py-10">
-                        <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
-                            Nurse Stress Dataset
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
-                            Data Cleaning
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
-                            Standardisasi Per Subjek
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                            <span>Sliding Window</span>
-                            <span class="text-[10px] font-normal opacity-80">(Window=60, Step=5)</span>
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                            <span>Pembentukan Tensor 3D</span>
-                            <span class="text-[10px] font-normal opacity-80">(Window × Time Step × Feature)</span>
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-indigo-50 border border-indigo-300 px-6 py-2 rounded-lg font-bold text-indigo-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                            <span>Empat Skenario Eksperimen</span>
-                            <span class="text-[10px] font-normal opacity-80">CNN-LSTM</span>
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                            <span>Pemilihan Model Terbaik</span>
-                            <span class="text-[10px] font-normal opacity-80">(Binary Subject-Dependent)</span>
-                        </div>
-                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                        
-                        <div class="bg-emerald-50 border border-emerald-400 px-6 py-3 rounded-full font-black text-emerald-800 text-sm shadow-md w-80 text-center z-10">
-                            Dashboard A-VISS
-                        </div>
-                    </div>
-                    
-                    <p class="figure-caption text-center mt-6 text-sm font-bold text-slate-800">Gambar 2.1 Workflow Tahapan Penelitian</p>
-                    
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-1', 'Gambar_2_1_Workflow')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm inline-flex items-center gap-2 transition">
-                            <span class="text-lg">⬇️</span> Download PNG
-                        </button>
-                    </div>
-                </div>
 
                 <div class="flex flex-col lg:flex-row gap-8">
                     <div class="lg:w-1/3 flex flex-col gap-2">
@@ -301,119 +519,19 @@
                             <div class="math-box text-sm">$$ z = \frac{x - \mu}{\sigma} $$</div>
 
                             <h4 class="font-bold text-slate-700 mt-4">B. Sliding Window Segmentation</h4>
-                            
-                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl my-4">
-                                <div class="bg-slate-900 rounded-xl p-6 overflow-x-auto shadow-inner border border-slate-700 w-full min-w-[500px]">
-                                    <div class="min-w-[480px]">
-                                        <!-- Timeline Axis -->
-                                        <div class="flex text-slate-400 text-xs font-mono mb-6 border-b border-slate-700 pb-2 relative w-full justify-between">
-                                            <div class="absolute -top-4 text-[10px] text-slate-500">Timeline Sensor (Detik):</div>
-                                            <!-- Explicit 0 to 70 step 5 -->
-                                            <span class="w-[30px] text-left">0</span>
-                                            <span class="w-[30px] text-center">5</span>
-                                            <span class="w-[30px] text-center">10</span>
-                                            <span class="w-[30px] text-center">15</span>
-                                            <span class="w-[30px] text-center">20</span>
-                                            <span class="w-[30px] text-center">25</span>
-                                            <span class="w-[30px] text-center">30</span>
-                                            <span class="w-[30px] text-center">35</span>
-                                            <span class="w-[30px] text-center">40</span>
-                                            <span class="w-[30px] text-center">45</span>
-                                            <span class="w-[30px] text-center">50</span>
-                                            <span class="w-[30px] text-center">55</span>
-                                            <span class="w-[30px] text-center">60</span>
-                                            <span class="w-[30px] text-center">65</span>
-                                            <span class="w-[30px] text-right">70</span>
-                                        </div>
-                                        <!-- Timeline Visualization -->
-                                        <div class="relative w-full h-[120px]">
-                                            <!-- Ruler Base -->
-                                            <div class="absolute top-[8px] left-[5px] right-[40px] border-t-2 border-dashed border-slate-600"></div>
-                                            
-                                            <!-- Window 1 -->
-                                            <div class="absolute left-0 w-[80%] h-8 bg-teal-500/20 border border-teal-500 rounded flex items-center px-3 text-teal-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(20,184,166,0.2)]">
-                                                Window 1 (60s)
-                                            </div>
-                                            <!-- Label Shift for Window 1 -->
-                                            <div class="absolute left-0 -top-4 text-[10px] text-teal-400 font-mono">&lt;---- 60 detik ----&gt;</div>
-
-                                            <!-- Window 2 (Starts at 5)-->
-                                            <div class="absolute left-[10%] top-10 w-[80%] h-8 bg-sky-500/20 border border-sky-500 rounded flex items-center px-3 text-sky-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(14,165,233,0.2)]">
-                                                Window 2 (60s)
-                                            </div>
-
-                                            <!-- Window 3 (Starts at 10)-->
-                                            <div class="absolute left-[20%] top-20 w-[80%] h-8 bg-indigo-500/20 border border-indigo-500 rounded flex items-center px-3 text-indigo-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(99,102,241,0.2)]">
-                                                Window 3 (60s)
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-6 flex flex-wrap justify-center gap-4 text-xs font-mono text-slate-300 bg-slate-800 py-3 rounded-lg border border-slate-700 shadow-md">
-                                        <span class="bg-slate-900 px-2 py-1 rounded"><span class="text-teal-400 font-bold">Window Size:</span> 60s</span>
-                                        <span class="bg-slate-900 px-2 py-1 rounded"><span class="text-rose-400 font-bold">Step Size:</span> 5s</span>
-                                        <span class="bg-slate-900 px-2 py-1 rounded"><span class="text-amber-400 font-bold">Overlap:</span> 55s</span>
-                                    </div>
-                                </div>
-                                <p class="text-center mt-4 text-sm font-bold text-slate-800">Gambar 2.2 Ilustrasi Segmentasi Sliding Window</p>
+                            <p class="text-sm text-slate-600 mb-2">Mengiris data kontinu menjadi sekuens tensor 3D berseri untuk mempertahankan riwayat waktu.</p>
+                            <div class="flex gap-4">
+                                <span class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded font-mono text-xs shadow-sm">Window: 60</span>
+                                <span class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded font-mono text-xs shadow-sm">Step: 5</span>
+                                <span class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded font-mono text-xs shadow-sm">Overlap: 55</span>
                             </div>
+                            <p class="text-xs text-teal-700 mt-4">*(Ilustrasi grafis Sliding Window tersedia di Seksi Lampiran Ekspor)*</p>
                         </div>
 
                         <div id="step-content-3" class="step-content hidden space-y-4">
                             <div class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2">Topologi Jaringan</div>
                             <h3 class="text-2xl font-extrabold text-slate-800">Arsitektur Hybrid CNN-LSTM</h3>
-                            <p class="text-sm text-slate-600">Representasi lengkap arsitektur dapat diunduh pada lampiran di bawah halaman.</p>
-                            
-                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl my-6">
-                                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm w-full py-10 overflow-x-auto">
-                                    
-                                    <h4 class="text-center text-sm font-bold text-slate-700 mb-6">Arsitektur Hybrid CNN-LSTM untuk Klasifikasi Stres Perawat</h4>
-                                    <div class="flex items-center min-w-max px-2 py-4">
-                                        <div class="bg-slate-200 border border-slate-400 px-4 py-3 rounded-lg text-slate-800 text-center shadow-sm z-10 text-xs">
-                                            <span class="font-bold text-sm">Input</span><br>(60x6)
-                                        </div>
-                                        <div class="w-5 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
-                                        
-                                        <!-- CNN Block 1 -->
-                                        <div class="bg-teal-50 border border-teal-400 p-2 rounded-lg text-center shadow-sm z-10 flex gap-2">
-                                            <div class="bg-white border border-teal-300 px-2 py-1 rounded text-teal-800 text-xs"><span class="font-bold">Conv1D</span><br>(32)</div>
-                                            <div class="bg-white border border-teal-300 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
-                                            <div class="bg-white border border-teal-300 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
-                                            <div class="bg-white border border-rose-300 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout<br>(0.3)</div>
-                                        </div>
-                                        
-                                        <div class="w-6 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
-
-                                        <!-- CNN Block 2 -->
-                                        <div class="bg-sky-50 border border-sky-400 p-2 rounded-lg text-center shadow-sm z-10 flex gap-2">
-                                            <div class="bg-white border border-sky-300 px-2 py-1 rounded text-sky-800 text-xs"><span class="font-bold">Conv1D</span><br>(64)</div>
-                                            <div class="bg-white border border-sky-300 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
-                                            <div class="bg-white border border-sky-300 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
-                                        </div>
-                                        
-                                        <div class="w-6 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
-
-                                        <!-- LSTM Block -->
-                                        <div class="bg-indigo-50 border border-indigo-400 p-2 rounded-lg text-center shadow-sm z-10 flex gap-2">
-                                            <div class="bg-white border border-indigo-300 px-2 py-1 rounded text-indigo-800 text-xs"><span class="font-bold">LSTM</span><br>(32)</div>
-                                            <div class="bg-white border border-rose-300 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout<br>(0.5)</div>
-                                        </div>
-
-                                        <div class="w-6 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
-
-                                        <!-- Dense Block -->
-                                        <div class="bg-amber-100 border border-amber-400 px-4 py-3 rounded-lg text-amber-900 text-center shadow-sm z-10 text-xs">
-                                            <span class="font-bold text-sm">Dense</span><br>(16)
-                                        </div>
-                                        <div class="w-4 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
-
-                                        <!-- Output Layer -->
-                                        <div class="bg-emerald-100 border border-emerald-500 px-4 py-3 rounded-full text-emerald-900 text-center shadow-md z-10 text-xs font-bold">
-                                            Output Sigmoid<br><span class="font-normal">(1 Neuron)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="text-center mt-4 text-sm font-bold text-slate-800">Gambar 2.3 Arsitektur Hybrid CNN-LSTM</p>
-                            </div>
+                            <p class="text-sm text-slate-600">Ekstraksi fitur lokal-spasial (CNN) dipadukan dengan retensi riwayat temporal (LSTM).</p>
                             
                             <div class="mt-4">
                                 <h4 class="font-bold text-slate-700 text-sm mb-2">Hyperparameter Final</h4>
@@ -427,6 +545,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <p class="text-xs text-teal-700 mt-4">*(Diagram hierarki arsitektur utuh tersedia di Seksi Lampiran Ekspor)*</p>
                         </div>
 
                         <div id="step-content-4" class="step-content hidden space-y-4">
@@ -453,77 +572,7 @@
                     <p class="text-slate-600 max-w-2xl mx-auto text-sm">
                         Diagram percabangan merepresentasikan logika implementasi model ke dalam <i>dashboard</i>. Setelah proses inferensi, sistem menghitung skor stres sebelum mendistribusikannya ke luaran visual.
                     </p>
-                </div>
-
-                <!-- GAMBAR 2.4: DASHBOARD WORKFLOW (WRAPPER) -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div id="export-target-4" class="figure-content bg-white rounded-2xl border border-slate-100 shadow-sm py-12 overflow-x-auto flex flex-col justify-center items-center">
-                        <div class="flex flex-col items-center min-w-[600px] px-8">
-                            
-                            <div class="fc-node fc-node-input bg-slate-50">
-                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Input Skenario</div>
-                                Pilih ID Subjek
-                            </div>
-                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                            
-                            <div class="fc-node fc-node-input bg-slate-50">
-                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Konfigurasi</div>
-                                Pilih Window Pengamatan
-                            </div>
-                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                            <div class="fc-node fc-node-process bg-sky-50">
-                                <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Back-End</div>
-                                Load Model CNN-LSTM (.keras)
-                            </div>
-                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                            <div class="fc-node fc-node-process bg-sky-50 shadow-md border-sky-400">
-                                <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Komputasi</div>
-                                Inferensi CNN-LSTM
-                            </div>
-                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                            <div class="fc-node bg-amber-50 border-amber-300 shadow-sm">
-                                <div class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-1">Analitik</div>
-                                Perhitungan Stress Score
-                            </div>
-                            
-                            <!-- Branching Line -->
-                            <div class="w-2 h-6 bg-slate-300"></div>
-                            <div class="w-[360px] h-1 bg-slate-300 relative">
-                                <div class="absolute -left-0.5 top-0 w-1 h-6 bg-slate-300"></div>
-                                <div class="absolute -right-0.5 top-0 w-1 h-6 bg-slate-300"></div>
-                            </div>
-
-                            <div class="flex justify-between w-[580px] mt-6 gap-8">
-                                <div class="flex flex-col items-center w-1/2">
-                                    <div class="fc-arrow-down mb-1"></div>
-                                    <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
-                                        <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 1</div>
-                                        Stress Score &<br>Status Klasifikasi<br>
-                                        <span class="text-xs font-normal opacity-70 mt-1 inline-block">(Normal / High Stress)</span>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-center w-1/2">
-                                    <div class="fc-arrow-down mb-1"></div>
-                                    <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
-                                        <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 2</div>
-                                        Visualisasi<br>Sinyal Fisiologis<br>
-                                        <span class="text-xs font-normal opacity-70 mt-1 inline-block">(HR, EDA, TEMP)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <p class="figure-caption text-center mt-6 text-sm font-bold text-slate-800">Gambar 2.4 Workflow Proses Inferensi dan Visualisasi Dashboard A-VISS v1.0</p>
-                    
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-4', 'Gambar_2_4_Dashboard_Workflow')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-xs font-bold shadow-sm inline-flex items-center gap-2 transition">
-                            <span class="text-lg">⬇️</span> Download PNG
-                        </button>
-                    </div>
+                    <a href="#lampiran-ekspor" class="text-xs text-teal-600 hover:underline mt-2 inline-block">Lihat versi lengkap resolusi tinggi di bawah ↓</a>
                 </div>
             </section>
 
@@ -535,26 +584,75 @@
                     </p>
                 </div>
 
-                <!-- GAMBAR 3.4: GRAFIK KOMPARASI KINERJA (WRAPPER) -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-                    <div id="export-target-5" class="figure-content bg-white p-8 rounded-xl border border-slate-100 shadow-sm w-full">
-                        <div class="mb-6 text-center">
-                            <h3 class="text-lg font-bold text-slate-800">Perbandingan Kinerja CNN-LSTM pada Empat Skenario Pengujian</h3>
-                            <p class="text-xs text-slate-500 mt-1">Metrik Accuracy (%) berdasarkan hasil eksperimen terkini.</p>
-                        </div>
-                        
-                        <!-- MANDATORY CHART CONTAINER -->
-                        <div class="chart-container">
-                            <canvas id="accuracyChart"></canvas>
-                        </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                    <div class="mb-6 text-center">
+                        <h3 class="text-lg font-bold text-slate-800">Perbandingan Kinerja CNN-LSTM pada Empat Skenario Pengujian</h3>
+                        <p class="text-xs text-slate-500 mt-1">Metrik Accuracy (%) berdasarkan hasil eksperimen terkini.</p>
                     </div>
-
-                    <p class="figure-caption text-center mt-6 text-sm font-bold text-slate-800">Gambar 3.4 Perbandingan Kinerja Model CNN-LSTM</p>
                     
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-5', 'Gambar_3_4_Komparasi_Akurasi')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm inline-flex items-center gap-2 transition">
-                            <span class="text-lg">⬇️</span> Download PNG
-                        </button>
+                    <div class="chart-container">
+                        <canvas id="accuracyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Confusion Matrix Section -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                    <div class="text-center mb-8">
+                        <h3 class="text-lg font-bold text-slate-800">Confusion Matrix: Model Binary Subject-Dependent</h3>
+                        <p class="text-xs text-slate-500 mt-1">Distribusi prediksi pada skenario terbaik (Akurasi 89%)</p>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-12">
+                        <div class="grid grid-cols-3 gap-1 text-center w-full max-w-sm">
+                            <div class="col-span-1"></div>
+                            <div class="col-span-2 grid grid-cols-2 text-xs font-bold text-slate-500 pb-2">
+                                <div>Prediksi Normal</div>
+                                <div>Prediksi Stress</div>
+                            </div>
+                            
+                            <div class="flex items-center justify-end pr-4 text-xs font-bold text-slate-500">Aktual Normal</div>
+                            <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-tl-lg flex flex-col items-center justify-center h-24">
+                                <span class="text-2xl font-black text-emerald-700">412</span>
+                                <span class="text-[10px] text-emerald-600 uppercase font-bold mt-1">True Negative</span>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-200 p-4 rounded-tr-lg flex flex-col items-center justify-center h-24 relative overflow-hidden">
+                                <span class="text-2xl font-black text-rose-700 z-10">48</span>
+                                <span class="text-[10px] text-rose-600 uppercase font-bold mt-1 z-10">False Positive</span>
+                                <div class="absolute inset-0 border-2 border-rose-400 rounded-tr-lg opacity-50"></div>
+                            </div>
+                            
+                            <div class="flex items-center justify-end pr-4 text-xs font-bold text-slate-500">Aktual Stress</div>
+                            <div class="bg-amber-50 border border-amber-200 p-4 rounded-bl-lg flex flex-col items-center justify-center h-24">
+                                <span class="text-2xl font-black text-amber-700">35</span>
+                                <span class="text-[10px] text-amber-600 uppercase font-bold mt-1">False Negative</span>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-200 p-4 rounded-br-lg flex flex-col items-center justify-center h-24">
+                                <span class="text-2xl font-black text-teal-700">265</span>
+                                <span class="text-[10px] text-teal-600 uppercase font-bold mt-1">True Positive</span>
+                            </div>
+                        </div>
+
+                        <div class="max-w-sm space-y-4">
+                            <h4 class="font-bold text-sm text-slate-800 border-b border-slate-100 pb-2">Interpretasi Klinis</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="text-xs font-bold text-rose-600 uppercase mb-1 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-rose-500"></span> False Positive (48)
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed">
+                                        Sistem membunyikan alarm padahal perawat dalam kondisi normal. Meskipun ada 48 kasus, angka ini diklaim jauh lebih rendah berkat pendekatan <i>Subject-Dependent</i> dibandingkan model global.
+                                    </p>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-amber-600 uppercase mb-1 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500"></span> False Negative (35)
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed">
+                                        Sistem gagal mendeteksi stres. Dalam konteks kelelahan staf, FP (Alarm Palsu) lebih diprioritaskan untuk ditekan guna mencegah <i>Alarm Fatigue</i>, namun FN tetap dijaga serendah mungkin.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -563,7 +661,7 @@
                         <h4 class="font-bold text-lg mb-3 text-teal-900 border-b border-teal-200 pb-2">Mengapa Subject-Dependent Lebih Baik?</h4>
                         <ul class="text-sm text-teal-800 space-y-3 list-disc list-inside px-2">
                             <li><b>Variabilitas Fisiologis:</b> Perbedaan detak jantung antar individu sangat tinggi.</li>
-                            <li><b>Standardisasi Efektif:</b> Pemusatan data per subjek membantu model mengenali pola fluktuasi personal.</li>
+                            <li><b>Standardisasi Efektif:</b> Pemusatan data per pasien membantu model mengenali pola fluktuasi personal.</li>
                             <li><b>Reduksi Bias:</b> Menghasilkan performa stabil (89%) dan mengurangi <i>False Alarm</i> dibandingkan <i>Independent</i> (65%).</li>
                         </ul>
                     </div>
@@ -677,438 +775,174 @@
                 </div>
             </section>
 
+            <!-- Technology Stack Section -->
+            <section id="teknologi" class="scroll-mt-24 mt-24 mb-12">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Built With</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto text-sm">
+                        Teknologi dan pustaka utama yang menggerakkan purwarupa A-VISS dari pemrosesan data hingga antarmuka.
+                    </p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm text-sm font-bold text-slate-700 flex items-center gap-2 hover:shadow-md transition cursor-default">
+                        <span class="text-blue-500">🐍</span> Python
+                    </div>
+                    <div class="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm text-sm font-bold text-slate-700 flex items-center gap-2 hover:shadow-md transition cursor-default">
+                        <span class="text-orange-500">🔶</span> TensorFlow
+                    </div>
+                    <div class="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm text-sm font-bold text-slate-700 flex items-center gap-2 hover:shadow-md transition cursor-default">
+                        <span class="text-blue-400">🔢</span> NumPy
+                    </div>
+                    <div class="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm text-sm font-bold text-slate-700 flex items-center gap-2 hover:shadow-md transition cursor-default">
+                        <span class="text-yellow-500">⚙️</span> Scikit-Learn
+                    </div>
+                    <div class="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm text-sm font-bold text-slate-700 flex items-center gap-2 hover:shadow-md transition cursor-default">
+                        <span class="text-rose-500">👑</span> Streamlit
+                    </div>
+                    <div class="bg-white border border-slate-200 px-6 py-3 rounded-full shadow-sm text-sm font-bold text-slate-700 flex items-center gap-2 hover:shadow-md transition cursor-default">
+                        <span class="text-indigo-500">📊</span> Plotly
+                    </div>
+                </div>
+            </section>
+
+            <!-- Raw Assets Section -->
+            <section id="raw-assets" class="scroll-mt-24 mt-24 mb-12">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Raw Assets Prompts</h2>
+                    <p class="text-slate-600 max-w-3xl mx-auto text-sm">
+                        Panduan dan prompt untuk men-generate gambar mockup mentah (raw asset) 1:1 yang akan dimasukkan ke dalam setiap hexagon dengan gaya visual yang konsisten.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- CNN-LSTM -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50">
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">1. CNN-LSTM</h3>
+                            <p class="text-xs font-bold text-teal-600 uppercase">Visualisasi arsitektur AI</p>
+                        </div>
+                        <div class="bg-slate-100 flex-grow p-6 flex items-center justify-center min-h-[200px]">
+                            <!-- HTML Graphic CNN-LSTM -->
+                            <div class="w-32 h-32 bg-white rounded-2xl border-4 border-teal-100 flex items-center justify-center shadow-lg relative transform rotate-3 hover:rotate-0 transition">
+                                <div class="absolute inset-2 border-2 border-dashed border-teal-200 rounded-xl"></div>
+                                <svg class="w-16 h-16 text-teal-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                <div class="absolute -bottom-3 text-[10px] bg-indigo-100 text-indigo-700 font-black px-4 py-1 rounded-full border border-indigo-200 shadow-sm">AI MODEL</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dataset -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50">
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">2. Dataset</h3>
+                            <p class="text-xs font-bold text-teal-600 uppercase">Representasi data penelitian</p>
+                        </div>
+                        <div class="bg-slate-100 flex-grow p-6 flex items-center justify-center min-h-[200px]">
+                            <!-- HTML Graphic Dataset -->
+                            <div class="w-32 h-32 bg-slate-50 rounded-full border-4 border-slate-200 flex flex-col items-center justify-center shadow-sm relative group">
+                                <svg class="w-14 h-14 text-slate-400 mb-1 group-hover:text-teal-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                                <div class="absolute -right-2 -top-1 bg-teal-100 text-teal-700 text-xs font-black px-3 py-1 rounded-full border border-teal-200 shadow-sm">CSV</div>
+                                <div class="flex gap-1.5 mt-1">
+                                    <div class="w-2 h-2 rounded-full bg-rose-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-sky-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard A-VISS -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50">
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">3. Dashboard A-VISS</h3>
+                            <p class="text-xs font-bold text-teal-600 uppercase">Preview dashboard Streamlit</p>
+                        </div>
+                        <div class="bg-slate-100 flex-grow p-6 flex items-center justify-center min-h-[200px]">
+                            <!-- HTML Graphic Dashboard -->
+                            <div class="w-48 h-32 bg-white rounded-lg shadow-md border border-slate-200 flex overflow-hidden group hover:shadow-lg transition">
+                                <div class="w-12 bg-slate-800 h-full p-2 flex flex-col gap-2">
+                                    <div class="w-full h-3 bg-teal-500 rounded-sm"></div>
+                                    <div class="w-full h-2 bg-slate-600 rounded-sm"></div>
+                                    <div class="w-full h-2 bg-slate-600 rounded-sm"></div>
+                                </div>
+                                <div class="flex-grow p-3 flex flex-col gap-2">
+                                    <div class="w-20 h-3 bg-slate-200 rounded-sm"></div>
+                                    <div class="flex gap-2">
+                                        <div class="w-10 h-10 bg-rose-50 border border-rose-200 rounded-md flex items-center justify-center">
+                                            <span class="text-xs font-black text-rose-500">89%</span>
+                                        </div>
+                                        <div class="flex-grow h-10 bg-slate-50 border border-slate-200 rounded-md flex items-end p-1 relative overflow-hidden">
+                                            <svg class="w-full h-6 text-teal-400 opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,10 L20,10 L30,0 L40,20 L50,10 L100,10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="w-full flex-grow bg-slate-100 rounded-sm mt-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wearable Sensor -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50">
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">4. Wearable Sensor</h3>
+                            <p class="text-xs font-bold text-teal-600 uppercase">Smartwatch medis</p>
+                        </div>
+                        <div class="bg-slate-100 flex-grow p-6 flex items-center justify-center min-h-[200px]">
+                            <!-- HTML Graphic Wearable -->
+                            <div class="w-24 h-36 bg-slate-800 rounded-3xl border-4 border-slate-300 flex items-center justify-center shadow-lg relative group transform hover:-translate-y-1 transition">
+                                <div class="absolute top-2 w-10 h-1.5 bg-slate-600 rounded-full"></div>
+                                <div class="w-16 h-16 bg-black rounded-full border-2 border-slate-600 flex items-center justify-center relative overflow-hidden">
+                                    <svg class="w-8 h-8 text-emerald-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                </div>
+                                <div class="absolute bottom-2 w-10 h-1.5 bg-slate-600 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sliding Window -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50">
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">5. Sliding Window</h3>
+                            <p class="text-xs font-bold text-teal-600 uppercase">Segmentasi time-series</p>
+                        </div>
+                        <div class="bg-slate-100 flex-grow p-6 flex items-center justify-center min-h-[200px]">
+                            <!-- HTML Graphic Sliding Window -->
+                            <div class="relative w-48 h-28 flex items-center justify-center group">
+                                <div class="absolute left-0 w-24 h-16 border-2 border-slate-200 rounded-xl bg-slate-50 opacity-60"></div>
+                                <div class="absolute left-6 top-3 w-24 h-16 border-2 border-slate-300 rounded-xl bg-slate-100 opacity-80"></div>
+                                <div class="absolute left-12 top-6 w-24 h-16 border-2 border-sky-400 rounded-xl bg-sky-50 shadow-md z-10 flex items-center justify-center transition-transform group-hover:translate-x-2 group-hover:translate-y-1">
+                                    <svg class="w-8 h-8 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualisasi Sinyal -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-slate-100 bg-slate-50">
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">6. Visualisasi Sinyal</h3>
+                            <p class="text-xs font-bold text-teal-600 uppercase">Data sensor fisiologis</p>
+                        </div>
+                        <div class="bg-slate-100 flex-grow p-6 flex items-center justify-center min-h-[200px]">
+                            <!-- HTML Graphic Visualisasi -->
+                            <div class="w-48 h-32 bg-slate-900 rounded-xl shadow-lg border border-slate-700 flex flex-col p-3 overflow-hidden relative group">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Signal Monitor</div>
+                                <div class="flex-grow relative flex items-center">
+                                    <div class="absolute inset-0 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:10px_10px] opacity-30"></div>
+                                    <svg class="w-full h-12 text-teal-400 relative z-10 group-hover:text-rose-400 transition-colors duration-500" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                        <path d="M0,15 L10,15 L15,5 L20,25 L25,15 L40,15 L45,0 L50,30 L55,15 L100,15" fill="none" stroke="currentColor" stroke-width="1.5" style="filter: drop-shadow(0 0 4px currentColor);"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
         
         <!-- SECTION: LAMPIRAN EKSPOR FULL SIZE & SEMUA GAMBAR -->
-        <section id="lampiran-ekspor" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 border-t border-slate-200 mt-24 pt-16">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4">Lampiran: Unduh Gambar Arsitektur & Grafik</h2>
-                <p class="text-slate-600 text-sm max-w-2xl mx-auto">
-                    Bagian ini didedikasikan untuk mengekspor seluruh bagan alir dan grafik dari Bab 1 hingga Bab 3 dengan resolusi optimal, tanpa elemen teks berlebih, untuk digunakan secara langsung di dalam laporan fisik.
-                </p>
-            </div>
-            
-            <div class="flex flex-col gap-12">
-
-                <!-- Export Target: Gambar 1.1 -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-1-1" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex justify-center py-10">
-                             <div class="flex flex-col items-center min-w-[300px]">
-                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
-                                    Nurse Stress Dataset
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
-                                    Preprocessing Data
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
-                                    Standardisasi Per Subjek
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
-                                    Sliding Window
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
-                                    Tensor 3D
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-indigo-50 border border-indigo-300 px-6 py-2 rounded-lg font-bold text-indigo-800 text-sm shadow-sm w-80 text-center z-10">
-                                    CNN-LSTM
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10">
-                                    Klasifikasi Subject-Dependent
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                                <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10">
-                                    Evaluasi Model
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-emerald-50 border border-emerald-400 px-6 py-3 rounded-full font-black text-emerald-800 text-sm shadow-md w-80 text-center z-10">
-                                    Dashboard A-VISS
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-1-1', 'Gambar_1_1_Alur_Umum')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 1.1)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Export Target: Gambar 1.2 -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-1-2" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex justify-center py-10">
-                             <div class="flex flex-col items-center min-w-[400px]">
-                                <div class="bg-rose-50 border border-rose-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
-                                    <div class="font-bold text-rose-800 text-sm text-center mb-2 border-b border-rose-200 pb-1">Permasalahan</div>
-                                    <ul class="list-disc list-inside text-xs text-rose-700 space-y-1">
-                                        <li>Tingginya stres kerja perawat ICU</li>
-                                        <li>Variabilitas fisiologis antar individu</li>
-                                        <li>Potensi terjadinya <i>alarm fatigue</i></li>
-                                    </ul>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-slate-100 border border-slate-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
-                                    <div class="font-bold text-slate-800 text-sm text-center mb-2 border-b border-slate-200 pb-1">Data Fisiologis Wearable</div>
-                                    <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                        <li>Heart Rate (HR)</li>
-                                        <li>Electrodermal Activity (EDA)</li>
-                                        <li>Skin Temperature (TEMP)</li>
-                                        <li>Accelerometer</li>
-                                    </ul>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
-                                    <div class="font-bold text-sky-800 text-sm text-center mb-2 border-b border-sky-200 pb-1">Pendekatan Subject-Dependent</div>
-                                    <ul class="list-disc list-inside text-xs text-sky-700 space-y-1">
-                                        <li>Standardisasi per subjek (Z-Score)</li>
-                                        <li>Pembentukan pola fluktuasi individual</li>
-                                    </ul>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-indigo-50 border border-indigo-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
-                                    <div class="font-bold text-indigo-800 text-sm text-center mb-2 border-b border-indigo-200 pb-1">Model CNN-LSTM</div>
-                                    <ul class="list-disc list-inside text-xs text-indigo-700 space-y-1">
-                                        <li>Ekstraksi fitur spasial (CNN)</li>
-                                        <li>Pembelajaran memori temporal (LSTM)</li>
-                                    </ul>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-amber-50 border border-amber-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
-                                    <div class="font-bold text-amber-800 text-sm text-center mb-2 border-b border-amber-200 pb-1">Klasifikasi Stres</div>
-                                    <ul class="list-disc list-inside text-xs text-amber-700 space-y-1">
-                                        <li>Kondisi Normal</li>
-                                        <li>Kondisi High Stress</li>
-                                    </ul>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-emerald-50 border border-emerald-400 px-6 py-4 rounded-xl shadow-md w-96 text-center z-10">
-                                    <div class="font-bold text-emerald-800 text-xs uppercase tracking-widest mb-1">Luaran Sistem</div>
-                                    <div class="font-black text-emerald-900 text-base">Dashboard A-VISS</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-1-2', 'Gambar_1_2_Kerangka_Pemikiran')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 1.2)
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Export Target 2.1: Workflow Bab 2 -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-2-1" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex justify-center py-10">
-                             <div class="flex flex-col items-center min-w-[300px]">
-                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
-                                    Nurse Stress Dataset
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
-                                    Data Cleaning
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
-                                    Standardisasi Per Subjek
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                                    <span>Sliding Window</span>
-                                    <span class="text-[10px] font-normal opacity-80">(Window=60, Step=5)</span>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                                    <span>Pembentukan Tensor 3D</span>
-                                    <span class="text-[10px] font-normal opacity-80">(Window × Time Step × Feature)</span>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-indigo-50 border border-indigo-300 px-6 py-2 rounded-lg font-bold text-indigo-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                                    <span>Empat Skenario Eksperimen</span>
-                                    <span class="text-[10px] font-normal opacity-80">CNN-LSTM</span>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
-                                    <span>Pemilihan Model Terbaik</span>
-                                    <span class="text-[10px] font-normal opacity-80">(Binary Subject-Dependent)</span>
-                                </div>
-                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="bg-emerald-50 border border-emerald-400 px-6 py-3 rounded-full font-black text-emerald-800 text-sm shadow-md w-80 text-center z-10">
-                                    Dashboard A-VISS
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-2-1', 'Gambar_2_1_Workflow_Bab2')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.1)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Export Target 2.2: Sliding Window -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-2-2" class="figure-content bg-slate-900 p-10 rounded-2xl border border-slate-700 shadow-sm min-w-max flex flex-col justify-center py-10 w-full min-w-[600px]">
-                            <div class="min-w-[550px] mx-auto w-full">
-                                <!-- Timeline Axis -->
-                                <div class="flex text-slate-400 text-xs font-mono mb-6 border-b border-slate-700 pb-2 relative w-full justify-between">
-                                    <div class="absolute -top-4 text-[10px] text-slate-500">Timeline Sensor (Detik):</div>
-                                    <!-- Explicit 0 to 70 step 5 -->
-                                    <span class="w-[30px] text-left">0</span>
-                                    <span class="w-[30px] text-center">5</span>
-                                    <span class="w-[30px] text-center">10</span>
-                                    <span class="w-[30px] text-center">15</span>
-                                    <span class="w-[30px] text-center">20</span>
-                                    <span class="w-[30px] text-center">25</span>
-                                    <span class="w-[30px] text-center">30</span>
-                                    <span class="w-[30px] text-center">35</span>
-                                    <span class="w-[30px] text-center">40</span>
-                                    <span class="w-[30px] text-center">45</span>
-                                    <span class="w-[30px] text-center">50</span>
-                                    <span class="w-[30px] text-center">55</span>
-                                    <span class="w-[30px] text-center">60</span>
-                                    <span class="w-[30px] text-center">65</span>
-                                    <span class="w-[30px] text-right">70</span>
-                                </div>
-                                <!-- Timeline Visualization -->
-                                <div class="relative w-full h-[140px]">
-                                    <!-- Ruler Base -->
-                                    <div class="absolute top-[8px] left-[0px] right-[0px] border-t-2 border-dashed border-slate-600"></div>
-                                    
-                                    <!-- Window 1 -->
-                                    <div class="absolute left-0 w-[85%] h-8 bg-teal-500/20 border border-teal-500 rounded flex items-center px-3 text-teal-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(20,184,166,0.2)]">
-                                        Window 1 (60s)
-                                    </div>
-                                    <!-- Label Shift for Window 1 -->
-                                    <div class="absolute left-0 -top-4 text-[10px] text-teal-400 font-mono w-[85%] text-center">&lt;--------------------------------- 60 detik ---------------------------------&gt;</div>
-
-                                    <!-- Window 2 (Starts at 5)-->
-                                    <div class="absolute left-[7.1%] top-12 w-[85%] h-8 bg-sky-500/20 border border-sky-500 rounded flex items-center px-3 text-sky-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(14,165,233,0.2)]">
-                                        Window 2 (60s)
-                                    </div>
-
-                                    <!-- Window 3 (Starts at 10)-->
-                                    <div class="absolute left-[14.2%] top-24 w-[85%] h-8 bg-indigo-500/20 border border-indigo-500 rounded flex items-center px-3 text-indigo-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(99,102,241,0.2)]">
-                                        Window 3 (60s)
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-10 flex flex-wrap justify-center gap-6 text-sm font-mono text-slate-300 bg-slate-800 py-3 rounded-lg border border-slate-700 shadow-md">
-                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-teal-400 font-bold">Window Size:</span> 60s</span>
-                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-rose-400 font-bold">Step Size:</span> 5s</span>
-                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-amber-400 font-bold">Overlap:</span> 55s</span>
-                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-sky-400 font-bold">Shape:</span> (Window × Time Step × Feature)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-2-2', 'Gambar_2_2_Sliding_Window')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.2)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Export Target 2.3: CNN-LSTM -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-2-3" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex flex-col justify-center">
-                            <div class="text-center text-lg font-bold text-slate-700 mb-8 mt-2">Arsitektur Hybrid CNN-LSTM untuk Klasifikasi Stres Perawat</div>
-                            <div class="flex flex-row items-center justify-center gap-4 px-4 w-full">
-                                
-                                <!-- Input Block -->
-                                <div class="flex flex-col items-center justify-center z-10 shrink-0">
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 h-4">Input</div>
-                                    <div class="bg-slate-200 border border-slate-400 px-4 py-3 rounded-lg text-slate-800 text-center shadow-sm text-xs">
-                                        <span class="font-bold text-sm">Input Tensor</span><br>(60x6)
-                                    </div>
-                                </div>
-
-                                <div class="text-slate-400 font-black text-lg mt-[1.3rem] shrink-0">→</div>
-                                
-                                <!-- CNN Feature Extraction Block -->
-                                <div class="flex flex-col items-center bg-teal-50/50 border-2 border-dashed border-teal-300 p-4 rounded-xl z-10">
-                                    <div class="text-[10px] font-bold text-teal-600 uppercase tracking-widest mb-2 h-4">[ CNN Feature Extraction ]</div>
-                                    
-                                    <div class="flex flex-row items-center gap-4">
-                                        <!-- Conv1D 1 -->
-                                        <div class="bg-white border border-teal-400 p-2 rounded-lg text-center shadow-sm flex flex-col gap-1 w-[120px]">
-                                            <div class="bg-teal-100 border border-teal-300 px-2 py-1 rounded text-teal-800 text-xs font-bold">Conv1D (32)</div>
-                                            <div class="bg-teal-50 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
-                                            <div class="bg-teal-50 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
-                                            <div class="bg-rose-50 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout(0.3)</div>
-                                        </div>
-                                        
-                                        <div class="text-teal-400 font-black text-lg shrink-0">→</div>
-                                        
-                                        <!-- Conv1D 2 -->
-                                        <div class="bg-white border border-sky-400 p-2 rounded-lg text-center shadow-sm flex flex-col gap-1 w-[120px]">
-                                            <div class="bg-sky-100 border border-sky-300 px-2 py-1 rounded text-sky-800 text-xs font-bold">Conv1D (64)</div>
-                                            <div class="bg-sky-50 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
-                                            <div class="bg-sky-50 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="text-slate-400 font-black text-lg shrink-0 mt-[1.3rem]">→</div>
-
-                                <!-- Temporal Learning Block -->
-                                <div class="flex flex-col items-center bg-indigo-50/50 border-2 border-dashed border-indigo-300 p-4 rounded-xl z-10 shrink-0">
-                                    <div class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2 h-4">[ Temporal Learning ]</div>
-                                    
-                                    <div class="bg-white border border-indigo-400 p-2 rounded-lg text-center shadow-sm flex flex-col gap-1 w-[120px]">
-                                        <div class="bg-indigo-100 border border-indigo-300 px-2 py-2 rounded text-indigo-800 text-xs font-bold">LSTM (32)</div>
-                                        <div class="bg-rose-50 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout(0.5)</div>
-                                    </div>
-                                </div>
-
-                                <div class="text-slate-400 font-black text-lg shrink-0 mt-[1.3rem]">→</div>
-
-                                <!-- Classification Block -->
-                                <div class="flex flex-col items-center bg-amber-50/50 border-2 border-dashed border-amber-300 p-4 rounded-xl z-10 shrink-0">
-                                    <div class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-2 h-4">[ Classification Block ]</div>
-                                    
-                                    <div class="flex flex-row items-center gap-4">
-                                        <div class="bg-amber-100 border border-amber-400 px-4 py-4 rounded-lg text-amber-900 text-center shadow-sm text-xs">
-                                            <span class="font-bold text-sm">Dense</span><br>(16)
-                                        </div>
-                                        
-                                        <div class="text-amber-400 font-black text-lg shrink-0">→</div>
-                                        
-                                        <div class="bg-emerald-100 border border-emerald-500 px-5 py-4 rounded-full text-emerald-900 text-center shadow-md text-xs font-bold">
-                                            Output Sigmoid<br><span class="font-normal">(1 Neuron)</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-2-3', 'Gambar_2_3_CNN_LSTM_FullScale')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.3)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Export Target 2.4: System Architecture -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-2-4" class="figure-content bg-white rounded-2xl border border-slate-100 shadow-sm py-12 flex flex-col justify-center items-center min-w-max w-full px-12">
-                            <div class="flex flex-col items-center min-w-[600px] px-8">
-                                
-                                <div class="fc-node fc-node-input bg-slate-50">
-                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Input Skenario</div>
-                                    Pilih ID Subjek
-                                </div>
-                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-                                
-                                <div class="fc-node fc-node-input bg-slate-50">
-                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Konfigurasi</div>
-                                    Pilih Window Pengamatan
-                                </div>
-                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                                <div class="fc-node fc-node-process bg-sky-50">
-                                    <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Back-End</div>
-                                    Load Model CNN-LSTM (.keras)
-                                </div>
-                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                                <div class="fc-node fc-node-process bg-sky-50 shadow-md border-sky-400">
-                                    <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Komputasi</div>
-                                    Inferensi CNN-LSTM
-                                </div>
-                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
-
-                                <div class="fc-node bg-amber-50 border-amber-300 shadow-sm">
-                                    <div class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-1">Analitik</div>
-                                    Perhitungan Stress Score
-                                </div>
-                                
-                                <div class="w-2 h-6 bg-slate-300"></div>
-                                <div class="w-[360px] h-1 bg-slate-300 relative">
-                                    <div class="absolute -left-0.5 top-0 w-1 h-6 bg-slate-300"></div>
-                                    <div class="absolute -right-0.5 top-0 w-1 h-6 bg-slate-300"></div>
-                                </div>
-
-                                <div class="flex justify-between w-[580px] mt-6 gap-8">
-                                    <div class="flex flex-col items-center w-1/2">
-                                        <div class="fc-arrow-down mb-1"></div>
-                                        <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
-                                            <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 1</div>
-                                            Stress Score &<br>Status Klasifikasi<br>
-                                            <span class="text-xs font-normal opacity-70 mt-1 inline-block">(Normal / High Stress)</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col items-center w-1/2">
-                                        <div class="fc-arrow-down mb-1"></div>
-                                        <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
-                                            <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 2</div>
-                                            Visualisasi<br>Sinyal Fisiologis<br>
-                                            <span class="text-xs font-normal opacity-70 mt-1 inline-block">(HR, EDA, TEMP)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-2-4', 'Gambar_2_4_Dashboard_Workflow')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.4)
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Export Target 3.4: Accuracy Chart -->
-                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <div class="inline-block min-w-full">
-                        <div id="export-target-full-3-4" class="figure-content bg-white p-8 rounded-xl border border-slate-100 shadow-sm w-full min-w-[700px]">
-                            <div class="mb-6 text-center">
-                                <h3 class="text-lg font-bold text-slate-800">Perbandingan Kinerja CNN-LSTM pada Empat Skenario Pengujian</h3>
-                                <p class="text-xs text-slate-500 mt-1">Metrik Accuracy (%) berdasarkan hasil eksperimen terkini.</p>
-                            </div>
-                            
-                            <div class="chart-container">
-                                <canvas id="accuracyChartExport"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button onclick="downloadFigure('export-target-full-3-4', 'Gambar_3_4_Komparasi_Akurasi')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
-                            <span class="text-xl">⬇️</span> Download PNG (Gambar 3.4)
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </section>
+        <!-- Bagian lampiran dipindahkan ke halaman terpisah (/downloads.html) untuk meningkatkan kecepatan muat halaman dan pengalaman pengguna. -->
 
     </div>
 
