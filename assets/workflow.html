@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-VISS: Laporan Interaktif Skripsi</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --text-main: #334155;
+            --primary: #0f766e;
+        }
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .math-box {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .step-btn {
+            transition: all 0.3s ease;
+        }
+        .step-btn.active {
+            background-color: #0f766e;
+            color: white;
+            border-color: #0f766e;
+            box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.2);
+        }
+        
+        .fc-node {
+            background-color: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            color: #334155;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            position: relative;
+            transition: all 0.3s;
+            width: 220px;
+        }
+        .fc-node:hover {
+            border-color: #0f766e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.2);
+        }
+        .fc-node-input { border-radius: 0.25rem 1.5rem 0.25rem 1.5rem; border-color: #94a3b8; }
+        .fc-node-process { border-radius: 0.5rem; border-color: #0ea5e9; }
+        .fc-node-output { border-radius: 1.5rem; border-color: #10b981; }
+        
+        .fc-line-v { width: 2px; height: 24px; background-color: #94a3b8; margin: 0 auto; position: relative; z-index: 0; }
+        .fc-arrow-down {
+            width: 0; height: 0; 
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #94a3b8;
+            margin: 0 auto;
+            position: relative;
+            top: -2px;
+        }
+        .fc-arrow-right {
+            width: 0; height: 0; 
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 8px solid #94a3b8;
+            display: inline-block;
+            margin-left: -2px;
+        }
+        
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-fast { animation: subtle-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+        .exporting .overflow-x-auto {
+            overflow: visible !important;
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="fixed w-full z-50 glass-header" id="main-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="font-bold text-teal-800 text-xl tracking-tight flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <span class="text-2xl">🧠</span> A-VISS
+                </div>
+                <div class="hidden md:flex space-x-6 text-sm font-semibold text-slate-600">
+                    <a href="#konteks" class="hover:text-teal-600 transition">Konteks</a>
+                    <a href="#metodologi" class="hover:text-teal-600 transition">Pipeline AI</a>
+                    <a href="#arsitektur" class="hover:text-teal-600 transition">Arsitektur SI</a>
+                    <a href="#hasil" class="hover:text-teal-600 transition">Hasil Uji</a>
+                    <a href="#simulasi" class="bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition shadow-sm">Simulasi Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="app-container">
+        
+        <header class="pt-32 pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
+            <div class="inline-block bg-teal-50 text-teal-700 border border-teal-200 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
+                Laporan Skripsi Interaktif
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-6 tracking-tight">
+                Klasifikasi Stres Perawat Menggunakan Pendekatan <span class="text-teal-700">Subject-Dependent CNN-LSTM</span>
+            </h1>
+            <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-3xl mx-auto">
+                Rancang bangun purwarupa <b>A-VISS (Adaptive Virtual ICU Support System)</b>. Implementasi <i>Deep Learning</i> ke dalam <i>dashboard</i> sistem informasi guna membantu mengurangi insiden <i>alarm fatigue</i> melalui standardisasi <i>baseline</i> fisiologis individu.
+            </p>
+            <div class="text-sm text-slate-500 mb-8 font-medium">Oleh: Jonathan Kwan (H071221067)</div>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#metodologi" class="bg-white text-slate-700 border border-slate-300 px-6 py-3 rounded-xl hover:bg-slate-50 transition font-semibold shadow-sm">Lihat Metodologi AI</a>
+                <a href="#simulasi" class="bg-teal-700 text-white px-6 py-3 rounded-xl hover:bg-teal-800 transition font-semibold shadow-lg shadow-teal-900/20">Coba Prototype Dashboard</a>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-24">
+
+            <section id="konteks" class="scroll-mt-24">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-8 md:p-12 border-b border-slate-100 bg-slate-50">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-4">Latar Belakang & Permasalahan Klinis</h2>
+                        <p class="text-slate-600 leading-relaxed max-w-4xl">
+                            Lingkungan ICU diwarnai oleh tekanan psikofisiologis tingkat tinggi. Sistem pemantauan tanda vital konvensional dihadapkan pada kendala variabilitas biologis, sehingga memicu serangkaian peringatan yang keliru (False Alarm).
+                        </p>
+                    </div>
+                    
+                    <div class="p-8 md:p-12 grid md:grid-cols-3 gap-8">
+                        <div class="space-y-4">
+                            <div class="text-4xl">🔕</div>
+                            <h3 class="text-lg font-bold text-slate-800">Alarm Fatigue</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Peringatan palsu yang berulang menurunkan kepekaan tenaga medis terhadap situasi darurat yang sebenarnya, berpotensi membahayakan pengambilan keputusan klinis.
+                            </p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="text-4xl">📈</div>
+                            <h3 class="text-lg font-bold text-slate-800">Variabilitas Baseline</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Model yang melatih semua data secara global (<i>Subject-Independent</i>) rentan menyalahartikan detak jantung bawaan yang alami tinggi sebagai indikasi stres.
+                            </p>
+                        </div>
+                        <div class="space-y-4 bg-teal-50 p-6 rounded-2xl border border-teal-100">
+                            <div class="text-4xl">🎯</div>
+                            <h3 class="text-lg font-bold text-teal-900">Solusi: Subject-Dependent</h3>
+                            <p class="text-sm text-teal-800 leading-relaxed">
+                                Menggunakan standardisasi per pasien. Model CNN-LSTM dilatih untuk mengenali fluktuasi yang khas bagi individu tersebut, membantu mengurangi bias prediksi secara signifikan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="metodologi" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">Metodologi & Pipeline Model AI</h2>
+                <p class="text-slate-600 mb-8">Eksplorasi alur komputasi dari dataset mentah hingga evaluasi akhir model. Seluruh diagram arsitektur dapat diunduh pada <a href="#lampiran-ekspor" class="text-teal-600 hover:underline">Seksi Lampiran</a>.</p>
+
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm mb-10">
+                    <div id="export-target-1" class="figure-content bg-white p-8 rounded-xl flex flex-col items-center min-w-[300px] overflow-x-auto shadow-sm border border-slate-100 py-10">
+                        <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
+                            Nurse Stress Dataset
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
+                            Data Cleaning
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
+                            Standardisasi Per Subjek
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                            <span>Sliding Window</span>
+                            <span class="text-[10px] font-normal opacity-80">(Window=60, Step=5)</span>
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                            <span>Pembentukan Tensor 3D</span>
+                            <span class="text-[10px] font-normal opacity-80">(Window × Time Step × Feature)</span>
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-indigo-50 border border-indigo-300 px-6 py-2 rounded-lg font-bold text-indigo-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                            <span>Empat Skenario Eksperimen</span>
+                            <span class="text-[10px] font-normal opacity-80">CNN-LSTM</span>
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                            <span>Pemilihan Model Terbaik</span>
+                            <span class="text-[10px] font-normal opacity-80">(Binary Subject-Dependent)</span>
+                        </div>
+                        <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                        
+                        <div class="bg-emerald-50 border border-emerald-400 px-6 py-3 rounded-full font-black text-emerald-800 text-sm shadow-md w-80 text-center z-10">
+                            Dashboard A-VISS
+                        </div>
+                    </div>
+                    
+                    <p class="figure-caption text-center mt-6 text-sm font-bold text-slate-800">Gambar 2.1 Workflow Tahapan Penelitian</p>
+                    
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-1', 'Gambar_2_1_Workflow')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm inline-flex items-center gap-2 transition">
+                            <span class="text-lg">⬇️</span> Download PNG
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/3 flex flex-col gap-2">
+                        <button class="step-btn active text-left px-5 py-4 rounded-xl border border-slate-200 bg-white font-semibold text-slate-700 z-10" data-step="1">
+                            1. Raw Dataset & Fitur
+                        </button>
+                        <div class="fc-line-v h-4 my-1"></div>
+                        <button class="step-btn text-left px-5 py-4 rounded-xl border border-slate-200 bg-white font-semibold text-slate-700 hover:bg-slate-50 z-10" data-step="2">
+                            2. Standardisasi & Windowing
+                        </button>
+                        <div class="fc-line-v h-4 my-1"></div>
+                        <button class="step-btn text-left px-5 py-4 rounded-xl border border-slate-200 bg-white font-semibold text-slate-700 hover:bg-slate-50 z-10" data-step="3">
+                            3. Arsitektur CNN-LSTM
+                        </button>
+                        <div class="fc-line-v h-4 my-1"></div>
+                        <button class="step-btn text-left px-5 py-4 rounded-xl border border-slate-200 bg-white font-semibold text-slate-700 hover:bg-slate-50 z-10" data-step="4">
+                            4. Evaluasi & Metrik
+                        </button>
+                    </div>
+
+                    <div class="lg:w-2/3 bg-white rounded-2xl border border-slate-200 shadow-sm p-8 min-h-[450px] flex flex-col justify-center">
+                        
+                        <div id="step-content-1" class="step-content block space-y-4">
+                            <div class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2">Data Sekunder</div>
+                            <h3 class="text-2xl font-extrabold text-slate-800">Deskripsi Variabel Sensor</h3>
+                            <p class="text-slate-600 leading-relaxed text-sm mb-4">
+                                Enam fitur fisiologis dan pergerakan fisik diekstraksi sebagai input model (Sumber: Hosseini et al., 2022).
+                            </p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="border border-slate-200 p-3 rounded-lg"><span class="font-bold text-teal-700 block">HR</span> Heart Rate</div>
+                                <div class="border border-slate-200 p-3 rounded-lg"><span class="font-bold text-teal-700 block">EDA</span> Electrodermal Activity</div>
+                                <div class="border border-slate-200 p-3 rounded-lg"><span class="font-bold text-teal-700 block">TEMP</span> Skin Temperature</div>
+                                <div class="border border-slate-200 p-3 rounded-lg"><span class="font-bold text-teal-700 block">X, Y, Z</span> Accelerometer 3D</div>
+                            </div>
+                        </div>
+
+                        <div id="step-content-2" class="step-content hidden space-y-4">
+                            <div class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2">Prapemrosesan</div>
+                            <h3 class="text-2xl font-extrabold text-slate-800">Standardisasi & Tensor 3D</h3>
+                            
+                            <h4 class="font-bold text-slate-700 mt-2">A. Standardisasi Per Pasien</h4>
+                            <p class="text-sm text-slate-600">Pemusatan fluktuasi berdasarkan ID Perawat secara independen menggunakan Z-Score.</p>
+                            <div class="math-box text-sm">$$ z = \frac{x - \mu}{\sigma} $$</div>
+
+                            <h4 class="font-bold text-slate-700 mt-4">B. Sliding Window Segmentation</h4>
+                            
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl my-4">
+                                <div class="bg-slate-900 rounded-xl p-6 overflow-x-auto shadow-inner border border-slate-700 w-full min-w-[500px]">
+                                    <div class="min-w-[480px]">
+                                        <!-- Timeline Axis -->
+                                        <div class="flex text-slate-400 text-xs font-mono mb-6 border-b border-slate-700 pb-2 relative w-full justify-between">
+                                            <div class="absolute -top-4 text-[10px] text-slate-500">Timeline Sensor (Detik):</div>
+                                            <!-- Explicit 0 to 70 step 5 -->
+                                            <span class="w-[30px] text-left">0</span>
+                                            <span class="w-[30px] text-center">5</span>
+                                            <span class="w-[30px] text-center">10</span>
+                                            <span class="w-[30px] text-center">15</span>
+                                            <span class="w-[30px] text-center">20</span>
+                                            <span class="w-[30px] text-center">25</span>
+                                            <span class="w-[30px] text-center">30</span>
+                                            <span class="w-[30px] text-center">35</span>
+                                            <span class="w-[30px] text-center">40</span>
+                                            <span class="w-[30px] text-center">45</span>
+                                            <span class="w-[30px] text-center">50</span>
+                                            <span class="w-[30px] text-center">55</span>
+                                            <span class="w-[30px] text-center">60</span>
+                                            <span class="w-[30px] text-center">65</span>
+                                            <span class="w-[30px] text-right">70</span>
+                                        </div>
+                                        <!-- Timeline Visualization -->
+                                        <div class="relative w-full h-[120px]">
+                                            <!-- Ruler Base -->
+                                            <div class="absolute top-[8px] left-[5px] right-[40px] border-t-2 border-dashed border-slate-600"></div>
+                                            
+                                            <!-- Window 1 -->
+                                            <div class="absolute left-0 w-[80%] h-8 bg-teal-500/20 border border-teal-500 rounded flex items-center px-3 text-teal-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(20,184,166,0.2)]">
+                                                Window 1 (60s)
+                                            </div>
+                                            <!-- Label Shift for Window 1 -->
+                                            <div class="absolute left-0 -top-4 text-[10px] text-teal-400 font-mono">&lt;---- 60 detik ----&gt;</div>
+
+                                            <!-- Window 2 (Starts at 5)-->
+                                            <div class="absolute left-[10%] top-10 w-[80%] h-8 bg-sky-500/20 border border-sky-500 rounded flex items-center px-3 text-sky-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(14,165,233,0.2)]">
+                                                Window 2 (60s)
+                                            </div>
+
+                                            <!-- Window 3 (Starts at 10)-->
+                                            <div class="absolute left-[20%] top-20 w-[80%] h-8 bg-indigo-500/20 border border-indigo-500 rounded flex items-center px-3 text-indigo-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(99,102,241,0.2)]">
+                                                Window 3 (60s)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6 flex flex-wrap justify-center gap-4 text-xs font-mono text-slate-300 bg-slate-800 py-3 rounded-lg border border-slate-700 shadow-md">
+                                        <span class="bg-slate-900 px-2 py-1 rounded"><span class="text-teal-400 font-bold">Window Size:</span> 60s</span>
+                                        <span class="bg-slate-900 px-2 py-1 rounded"><span class="text-rose-400 font-bold">Step Size:</span> 5s</span>
+                                        <span class="bg-slate-900 px-2 py-1 rounded"><span class="text-amber-400 font-bold">Overlap:</span> 55s</span>
+                                    </div>
+                                </div>
+                                <p class="text-center mt-4 text-sm font-bold text-slate-800">Gambar 2.2 Ilustrasi Segmentasi Sliding Window</p>
+                            </div>
+                        </div>
+
+                        <div id="step-content-3" class="step-content hidden space-y-4">
+                            <div class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2">Topologi Jaringan</div>
+                            <h3 class="text-2xl font-extrabold text-slate-800">Arsitektur Hybrid CNN-LSTM</h3>
+                            <p class="text-sm text-slate-600">Representasi lengkap arsitektur dapat diunduh pada lampiran di bawah halaman.</p>
+                            
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl my-6">
+                                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm w-full py-10 overflow-x-auto">
+                                    
+                                    <h4 class="text-center text-sm font-bold text-slate-700 mb-6">Arsitektur Hybrid CNN-LSTM untuk Klasifikasi Stres Perawat</h4>
+                                    <div class="flex items-center min-w-max px-2 py-4">
+                                        <div class="bg-slate-200 border border-slate-400 px-4 py-3 rounded-lg text-slate-800 text-center shadow-sm z-10 text-xs">
+                                            <span class="font-bold text-sm">Input</span><br>(60x6)
+                                        </div>
+                                        <div class="w-5 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
+                                        
+                                        <!-- CNN Block 1 -->
+                                        <div class="bg-teal-50 border border-teal-400 p-2 rounded-lg text-center shadow-sm z-10 flex gap-2">
+                                            <div class="bg-white border border-teal-300 px-2 py-1 rounded text-teal-800 text-xs"><span class="font-bold">Conv1D</span><br>(32)</div>
+                                            <div class="bg-white border border-teal-300 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
+                                            <div class="bg-white border border-teal-300 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
+                                            <div class="bg-white border border-rose-300 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout<br>(0.3)</div>
+                                        </div>
+                                        
+                                        <div class="w-6 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
+
+                                        <!-- CNN Block 2 -->
+                                        <div class="bg-sky-50 border border-sky-400 p-2 rounded-lg text-center shadow-sm z-10 flex gap-2">
+                                            <div class="bg-white border border-sky-300 px-2 py-1 rounded text-sky-800 text-xs"><span class="font-bold">Conv1D</span><br>(64)</div>
+                                            <div class="bg-white border border-sky-300 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
+                                            <div class="bg-white border border-sky-300 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
+                                        </div>
+                                        
+                                        <div class="w-6 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
+
+                                        <!-- LSTM Block -->
+                                        <div class="bg-indigo-50 border border-indigo-400 p-2 rounded-lg text-center shadow-sm z-10 flex gap-2">
+                                            <div class="bg-white border border-indigo-300 px-2 py-1 rounded text-indigo-800 text-xs"><span class="font-bold">LSTM</span><br>(32)</div>
+                                            <div class="bg-white border border-rose-300 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout<br>(0.5)</div>
+                                        </div>
+
+                                        <div class="w-6 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
+
+                                        <!-- Dense Block -->
+                                        <div class="bg-amber-100 border border-amber-400 px-4 py-3 rounded-lg text-amber-900 text-center shadow-sm z-10 text-xs">
+                                            <span class="font-bold text-sm">Dense</span><br>(16)
+                                        </div>
+                                        <div class="w-4 h-0.5 bg-slate-400"></div><div class="fc-arrow-right z-10"></div>
+
+                                        <!-- Output Layer -->
+                                        <div class="bg-emerald-100 border border-emerald-500 px-4 py-3 rounded-full text-emerald-900 text-center shadow-md z-10 text-xs font-bold">
+                                            Output Sigmoid<br><span class="font-normal">(1 Neuron)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-center mt-4 text-sm font-bold text-slate-800">Gambar 2.3 Arsitektur Hybrid CNN-LSTM</p>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h4 class="font-bold text-slate-700 text-sm mb-2">Hyperparameter Final</h4>
+                                <table class="w-full text-xs text-left text-slate-600 border border-slate-200">
+                                    <tbody class="divide-y divide-slate-100">
+                                        <tr><td class="px-3 py-2 font-semibold bg-slate-50">Optimizer</td><td class="px-3 py-2">Adam</td></tr>
+                                        <tr><td class="px-3 py-2 font-semibold bg-slate-50">Loss Function</td><td class="px-3 py-2">Binary Cross-Entropy (BCE)</td></tr>
+                                        <tr><td class="px-3 py-2 font-semibold bg-slate-50">Batch Size</td><td class="px-3 py-2">128</td></tr>
+                                        <tr><td class="px-3 py-2 font-semibold bg-slate-50">Epochs</td><td class="px-3 py-2">40</td></tr>
+                                        <tr><td class="px-3 py-2 font-semibold bg-slate-50">Patience (Early Stopping)</td><td class="px-3 py-2">8</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="step-content-4" class="step-content hidden space-y-4">
+                            <div class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2">Validasi</div>
+                            <h3 class="text-2xl font-extrabold text-slate-800">Evaluasi Metrik Model</h3>
+                            <p class="text-slate-600 leading-relaxed text-sm mb-4">
+                                Model dievaluasi menggunakan pembagian data berstrata (<code>train_test_split</code> dengan <code>stratify=y</code>). Kinerja utama diukur berdasarkan Akurasi.
+                            </p>
+                            <div class="math-box text-sm py-4">
+                                $$ Accuracy = \frac{TP + TN}{TP + TN + FP + FN} $$
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">
+                                Fokus observasi tambahan dilakukan pada metrik <b>False Positive (FP)</b>, merepresentasikan sistem memicu alarm pada subjek normal.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <section id="arsitektur" class="scroll-mt-24">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Alur Integrasi Sistem Informasi</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto text-sm">
+                        Diagram percabangan merepresentasikan logika implementasi model ke dalam <i>dashboard</i>. Setelah proses inferensi, sistem menghitung skor stres sebelum mendistribusikannya ke luaran visual.
+                    </p>
+                </div>
+
+                <!-- GAMBAR 2.4: DASHBOARD WORKFLOW (WRAPPER) -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <div id="export-target-4" class="figure-content bg-white rounded-2xl border border-slate-100 shadow-sm py-12 overflow-x-auto flex flex-col justify-center items-center">
+                        <div class="flex flex-col items-center min-w-[600px] px-8">
+                            
+                            <div class="fc-node fc-node-input bg-slate-50">
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Input Skenario</div>
+                                Pilih ID Subjek
+                            </div>
+                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                            
+                            <div class="fc-node fc-node-input bg-slate-50">
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Konfigurasi</div>
+                                Pilih Window Pengamatan
+                            </div>
+                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                            <div class="fc-node fc-node-process bg-sky-50">
+                                <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Back-End</div>
+                                Load Model CNN-LSTM (.keras)
+                            </div>
+                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                            <div class="fc-node fc-node-process bg-sky-50 shadow-md border-sky-400">
+                                <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Komputasi</div>
+                                Inferensi CNN-LSTM
+                            </div>
+                            <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                            <div class="fc-node bg-amber-50 border-amber-300 shadow-sm">
+                                <div class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-1">Analitik</div>
+                                Perhitungan Stress Score
+                            </div>
+                            
+                            <!-- Branching Line -->
+                            <div class="w-2 h-6 bg-slate-300"></div>
+                            <div class="w-[360px] h-1 bg-slate-300 relative">
+                                <div class="absolute -left-0.5 top-0 w-1 h-6 bg-slate-300"></div>
+                                <div class="absolute -right-0.5 top-0 w-1 h-6 bg-slate-300"></div>
+                            </div>
+
+                            <div class="flex justify-between w-[580px] mt-6 gap-8">
+                                <div class="flex flex-col items-center w-1/2">
+                                    <div class="fc-arrow-down mb-1"></div>
+                                    <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
+                                        <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 1</div>
+                                        Stress Score &<br>Status Klasifikasi<br>
+                                        <span class="text-xs font-normal opacity-70 mt-1 inline-block">(Normal / High Stress)</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center w-1/2">
+                                    <div class="fc-arrow-down mb-1"></div>
+                                    <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
+                                        <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 2</div>
+                                        Visualisasi<br>Sinyal Fisiologis<br>
+                                        <span class="text-xs font-normal opacity-70 mt-1 inline-block">(HR, EDA, TEMP)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="figure-caption text-center mt-6 text-sm font-bold text-slate-800">Gambar 2.4 Workflow Proses Inferensi dan Visualisasi Dashboard A-VISS v1.0</p>
+                    
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-4', 'Gambar_2_4_Dashboard_Workflow')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-xs font-bold shadow-sm inline-flex items-center gap-2 transition">
+                            <span class="text-lg">⬇️</span> Download PNG
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="hasil" class="scroll-mt-24">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">Evaluasi Performa & Akurasi</h2>
+                    <p class="text-slate-600 max-w-3xl text-sm">
+                        Komparasi eksperimental mendemonstrasikan peningkatan stabilitas prediksi melalui arsitektur CNN-LSTM yang dikalibrasi secara Biner dan <i>Subject-Dependent</i>.
+                    </p>
+                </div>
+
+                <!-- GAMBAR 3.4: GRAFIK KOMPARASI KINERJA (WRAPPER) -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                    <div id="export-target-5" class="figure-content bg-white p-8 rounded-xl border border-slate-100 shadow-sm w-full">
+                        <div class="mb-6 text-center">
+                            <h3 class="text-lg font-bold text-slate-800">Perbandingan Kinerja CNN-LSTM pada Empat Skenario Pengujian</h3>
+                            <p class="text-xs text-slate-500 mt-1">Metrik Accuracy (%) berdasarkan hasil eksperimen terkini.</p>
+                        </div>
+                        
+                        <!-- MANDATORY CHART CONTAINER -->
+                        <div class="chart-container">
+                            <canvas id="accuracyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <p class="figure-caption text-center mt-6 text-sm font-bold text-slate-800">Gambar 3.4 Perbandingan Kinerja Model CNN-LSTM</p>
+                    
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-5', 'Gambar_3_4_Komparasi_Akurasi')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm inline-flex items-center gap-2 transition">
+                            <span class="text-lg">⬇️</span> Download PNG
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-teal-50 border border-teal-200 p-6 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-3 text-teal-900 border-b border-teal-200 pb-2">Mengapa Subject-Dependent Lebih Baik?</h4>
+                        <ul class="text-sm text-teal-800 space-y-3 list-disc list-inside px-2">
+                            <li><b>Variabilitas Fisiologis:</b> Perbedaan detak jantung antar individu sangat tinggi.</li>
+                            <li><b>Standardisasi Efektif:</b> Pemusatan data per subjek membantu model mengenali pola fluktuasi personal.</li>
+                            <li><b>Reduksi Bias:</b> Menghasilkan performa stabil (89%) dan mengurangi <i>False Alarm</i> dibandingkan <i>Independent</i> (65%).</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl">
+                        <h4 class="font-bold text-lg mb-3 text-indigo-900 border-b border-indigo-200 pb-2">Mengapa Klasifikasi Biner Lebih Baik?</h4>
+                        <ul class="text-sm text-indigo-800 space-y-3 list-disc list-inside px-2">
+                            <li><b>Reduksi Kompleksitas:</b> Fokus hanya pada dua kondisi ekstrem.</li>
+                            <li><b>Batas Spasial Jelas:</b> Ambang keputusan antar kelas lebih mudah dipisahkan oleh CNN.</li>
+                            <li><b>Optimalisasi LSTM:</b> Pola sekuensial lebih mudah dipelajari tanpa distorsi kelas menengah.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="simulasi" class="scroll-mt-24">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Simulasi Dashboard A-VISS v1.0</h2>
+                    <p class="text-slate-600 max-w-3xl mx-auto text-sm">
+                        Implementasi fungsional dari arsitektur ke dalam antarmuka berbasis web.
+                    </p>
+                </div>
+
+                <div class="bg-[#0e1117] rounded-xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col lg:flex-row font-sans max-w-5xl mx-auto">
+                    
+                    <div class="w-full lg:w-[280px] bg-[#262730] p-6 flex flex-col shrink-0 border-r border-slate-700 relative z-10">
+                        <div class="font-bold text-white text-lg mb-8 flex items-center gap-3">
+                            <span class="bg-teal-600 text-white w-8 h-8 rounded-md flex items-center justify-center text-sm shadow">A</span>
+                            A-VISS Console
+                        </div>
+                        
+                        <div class="space-y-5 flex-grow">
+                            <div>
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-2">ID Subjek Pengamatan</div>
+                                <select class="w-full bg-[#0e1117] text-slate-200 text-sm border border-slate-600 rounded p-2 focus:outline-none focus:border-teal-500">
+                                    <option>Nurse-08A</option>
+                                    <option>Nurse-12B</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-2">Window (Detik)</div>
+                                <select class="w-full bg-[#0e1117] text-slate-200 text-sm border border-slate-600 rounded p-2 focus:outline-none focus:border-teal-500">
+                                    <option>60 Detik</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-400 mb-2">Model Aktif:</div>
+                                <div class="text-xs text-teal-400 bg-teal-900/30 p-2 rounded border border-teal-800 mb-4 font-mono break-all">model_binary_subject_dependent.keras</div>
+                                
+                                <button id="btn-toggle-sim" class="w-full bg-teal-600 hover:bg-teal-500 text-white py-2.5 px-4 rounded text-sm transition shadow-md font-bold uppercase tracking-wide">
+                                    Mulai Inferensi
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-4 border-t border-slate-700">
+                            <button id="btn-inject-stress" class="w-full border border-rose-500/50 text-rose-400 hover:bg-rose-950 py-2 rounded text-xs transition opacity-40 cursor-not-allowed uppercase font-bold" disabled>
+                                ⚡ Uji Peringatan Stres
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-grow bg-[#0e1117] p-6 lg:p-8 flex flex-col relative overflow-hidden">
+                        
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold text-white">Panel Monitoring Fisiologis</h2>
+                            <div id="conn-status" class="flex items-center gap-2 text-xs font-medium text-slate-500 bg-[#262730] px-3 py-1 rounded-full border border-slate-700">
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span> Sistem Menunggu
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="md:col-span-1 bg-[#262730] rounded-xl p-5 border border-slate-700 flex flex-col justify-center relative overflow-hidden">
+                                <div class="text-slate-400 text-xs uppercase font-bold mb-1">Status Klasifikasi</div>
+                                <div id="dash-status" class="text-2xl font-black text-slate-500 z-10 transition-colors">STANDBY</div>
+                                
+                                <div class="mt-4 pt-4 border-t border-slate-700/50 w-full z-10">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-400">Stress Score</span>
+                                        <span id="dash-score" class="text-white font-mono">0.00</span>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                        <div id="score-bar" class="bg-teal-500 h-full w-0 transition-all duration-300"></div>
+                                    </div>
+                                </div>
+                                <div id="status-bg" class="absolute inset-0 opacity-0 transition-opacity duration-300"></div>
+                            </div>
+
+                            <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                                <div class="bg-[#262730] rounded-xl p-4 border border-slate-700 flex flex-col justify-center">
+                                    <div class="text-slate-400 text-xs uppercase mb-1">Heart Rate</div>
+                                    <div class="text-3xl font-bold text-white"><span id="dash-hr">--</span> <span class="text-sm font-normal text-slate-500">bpm</span></div>
+                                </div>
+                                <div class="bg-[#262730] rounded-xl p-4 border border-slate-700 flex flex-col justify-center">
+                                    <div class="text-slate-400 text-xs uppercase mb-1">Skin Temp</div>
+                                    <div class="text-3xl font-bold text-white"><span id="dash-temp">--</span> <span class="text-sm font-normal text-slate-500">°C</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#262730] rounded-xl p-4 border border-slate-700 flex-grow flex flex-col relative">
+                            <div class="text-slate-300 text-sm font-semibold mb-2">Visualisasi Sinyal Waktu Nyata (HR)</div>
+                            <div class="chart-container flex-grow h-[200px] w-full max-w-full z-10">
+                                <canvas id="simChart"></canvas>
+                            </div>
+                            <div id="alert-overlay" class="absolute inset-0 border-2 border-rose-500 rounded-xl pointer-events-none opacity-0 transition-opacity duration-300 animate-pulse-fast z-20 shadow-[inset_0_0_20px_rgba(225,29,72,0.3)]"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        
+        <!-- SECTION: LAMPIRAN EKSPOR FULL SIZE & SEMUA GAMBAR -->
+        <section id="lampiran-ekspor" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 border-t border-slate-200 mt-24 pt-16">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Lampiran: Unduh Gambar Arsitektur & Grafik</h2>
+                <p class="text-slate-600 text-sm max-w-2xl mx-auto">
+                    Bagian ini didedikasikan untuk mengekspor seluruh bagan alir dan grafik dari Bab 1 hingga Bab 3 dengan resolusi optimal, tanpa elemen teks berlebih, untuk digunakan secara langsung di dalam laporan fisik.
+                </p>
+            </div>
+            
+            <div class="flex flex-col gap-12">
+
+                <!-- Export Target: Gambar 1.1 -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-1-1" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex justify-center py-10">
+                             <div class="flex flex-col items-center min-w-[300px]">
+                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
+                                    Nurse Stress Dataset
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
+                                    Preprocessing Data
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
+                                    Standardisasi Per Subjek
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
+                                    Sliding Window
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
+                                    Tensor 3D
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-indigo-50 border border-indigo-300 px-6 py-2 rounded-lg font-bold text-indigo-800 text-sm shadow-sm w-80 text-center z-10">
+                                    CNN-LSTM
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10">
+                                    Klasifikasi Subject-Dependent
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                                <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10">
+                                    Evaluasi Model
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-emerald-50 border border-emerald-400 px-6 py-3 rounded-full font-black text-emerald-800 text-sm shadow-md w-80 text-center z-10">
+                                    Dashboard A-VISS
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-1-1', 'Gambar_1_1_Alur_Umum')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 1.1)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Target: Gambar 1.2 -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-1-2" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex justify-center py-10">
+                             <div class="flex flex-col items-center min-w-[400px]">
+                                <div class="bg-rose-50 border border-rose-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
+                                    <div class="font-bold text-rose-800 text-sm text-center mb-2 border-b border-rose-200 pb-1">Permasalahan</div>
+                                    <ul class="list-disc list-inside text-xs text-rose-700 space-y-1">
+                                        <li>Tingginya stres kerja perawat ICU</li>
+                                        <li>Variabilitas fisiologis antar individu</li>
+                                        <li>Potensi terjadinya <i>alarm fatigue</i></li>
+                                    </ul>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-slate-100 border border-slate-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
+                                    <div class="font-bold text-slate-800 text-sm text-center mb-2 border-b border-slate-200 pb-1">Data Fisiologis Wearable</div>
+                                    <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                        <li>Heart Rate (HR)</li>
+                                        <li>Electrodermal Activity (EDA)</li>
+                                        <li>Skin Temperature (TEMP)</li>
+                                        <li>Accelerometer</li>
+                                    </ul>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
+                                    <div class="font-bold text-sky-800 text-sm text-center mb-2 border-b border-sky-200 pb-1">Pendekatan Subject-Dependent</div>
+                                    <ul class="list-disc list-inside text-xs text-sky-700 space-y-1">
+                                        <li>Standardisasi per subjek (Z-Score)</li>
+                                        <li>Pembentukan pola fluktuasi individual</li>
+                                    </ul>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-indigo-50 border border-indigo-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
+                                    <div class="font-bold text-indigo-800 text-sm text-center mb-2 border-b border-indigo-200 pb-1">Model CNN-LSTM</div>
+                                    <ul class="list-disc list-inside text-xs text-indigo-700 space-y-1">
+                                        <li>Ekstraksi fitur spasial (CNN)</li>
+                                        <li>Pembelajaran memori temporal (LSTM)</li>
+                                    </ul>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-amber-50 border border-amber-300 px-6 py-4 rounded-lg shadow-sm w-96 text-left z-10">
+                                    <div class="font-bold text-amber-800 text-sm text-center mb-2 border-b border-amber-200 pb-1">Klasifikasi Stres</div>
+                                    <ul class="list-disc list-inside text-xs text-amber-700 space-y-1">
+                                        <li>Kondisi Normal</li>
+                                        <li>Kondisi High Stress</li>
+                                    </ul>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-emerald-50 border border-emerald-400 px-6 py-4 rounded-xl shadow-md w-96 text-center z-10">
+                                    <div class="font-bold text-emerald-800 text-xs uppercase tracking-widest mb-1">Luaran Sistem</div>
+                                    <div class="font-black text-emerald-900 text-base">Dashboard A-VISS</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-1-2', 'Gambar_1_2_Kerangka_Pemikiran')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 1.2)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Export Target 2.1: Workflow Bab 2 -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-2-1" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex justify-center py-10">
+                             <div class="flex flex-col items-center min-w-[300px]">
+                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
+                                    Nurse Stress Dataset
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg font-bold text-slate-700 text-sm shadow-sm w-80 text-center z-10">
+                                    Data Cleaning
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10">
+                                    Standardisasi Per Subjek
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                                    <span>Sliding Window</span>
+                                    <span class="text-[10px] font-normal opacity-80">(Window=60, Step=5)</span>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-sky-50 border border-sky-300 px-6 py-2 rounded-lg font-bold text-sky-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                                    <span>Pembentukan Tensor 3D</span>
+                                    <span class="text-[10px] font-normal opacity-80">(Window × Time Step × Feature)</span>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-indigo-50 border border-indigo-300 px-6 py-2 rounded-lg font-bold text-indigo-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                                    <span>Empat Skenario Eksperimen</span>
+                                    <span class="text-[10px] font-normal opacity-80">CNN-LSTM</span>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-amber-50 border border-amber-300 px-6 py-2 rounded-lg font-bold text-amber-800 text-sm shadow-sm w-80 text-center z-10 flex flex-col">
+                                    <span>Pemilihan Model Terbaik</span>
+                                    <span class="text-[10px] font-normal opacity-80">(Binary Subject-Dependent)</span>
+                                </div>
+                                <div class="fc-line-v h-6"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="bg-emerald-50 border border-emerald-400 px-6 py-3 rounded-full font-black text-emerald-800 text-sm shadow-md w-80 text-center z-10">
+                                    Dashboard A-VISS
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-2-1', 'Gambar_2_1_Workflow_Bab2')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.1)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Target 2.2: Sliding Window -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-2-2" class="figure-content bg-slate-900 p-10 rounded-2xl border border-slate-700 shadow-sm min-w-max flex flex-col justify-center py-10 w-full min-w-[600px]">
+                            <div class="min-w-[550px] mx-auto w-full">
+                                <!-- Timeline Axis -->
+                                <div class="flex text-slate-400 text-xs font-mono mb-6 border-b border-slate-700 pb-2 relative w-full justify-between">
+                                    <div class="absolute -top-4 text-[10px] text-slate-500">Timeline Sensor (Detik):</div>
+                                    <!-- Explicit 0 to 70 step 5 -->
+                                    <span class="w-[30px] text-left">0</span>
+                                    <span class="w-[30px] text-center">5</span>
+                                    <span class="w-[30px] text-center">10</span>
+                                    <span class="w-[30px] text-center">15</span>
+                                    <span class="w-[30px] text-center">20</span>
+                                    <span class="w-[30px] text-center">25</span>
+                                    <span class="w-[30px] text-center">30</span>
+                                    <span class="w-[30px] text-center">35</span>
+                                    <span class="w-[30px] text-center">40</span>
+                                    <span class="w-[30px] text-center">45</span>
+                                    <span class="w-[30px] text-center">50</span>
+                                    <span class="w-[30px] text-center">55</span>
+                                    <span class="w-[30px] text-center">60</span>
+                                    <span class="w-[30px] text-center">65</span>
+                                    <span class="w-[30px] text-right">70</span>
+                                </div>
+                                <!-- Timeline Visualization -->
+                                <div class="relative w-full h-[140px]">
+                                    <!-- Ruler Base -->
+                                    <div class="absolute top-[8px] left-[0px] right-[0px] border-t-2 border-dashed border-slate-600"></div>
+                                    
+                                    <!-- Window 1 -->
+                                    <div class="absolute left-0 w-[85%] h-8 bg-teal-500/20 border border-teal-500 rounded flex items-center px-3 text-teal-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(20,184,166,0.2)]">
+                                        Window 1 (60s)
+                                    </div>
+                                    <!-- Label Shift for Window 1 -->
+                                    <div class="absolute left-0 -top-4 text-[10px] text-teal-400 font-mono w-[85%] text-center">&lt;--------------------------------- 60 detik ---------------------------------&gt;</div>
+
+                                    <!-- Window 2 (Starts at 5)-->
+                                    <div class="absolute left-[7.1%] top-12 w-[85%] h-8 bg-sky-500/20 border border-sky-500 rounded flex items-center px-3 text-sky-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(14,165,233,0.2)]">
+                                        Window 2 (60s)
+                                    </div>
+
+                                    <!-- Window 3 (Starts at 10)-->
+                                    <div class="absolute left-[14.2%] top-24 w-[85%] h-8 bg-indigo-500/20 border border-indigo-500 rounded flex items-center px-3 text-indigo-300 text-xs font-bold shadow-[inset_0_0_10px_rgba(99,102,241,0.2)]">
+                                        Window 3 (60s)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-10 flex flex-wrap justify-center gap-6 text-sm font-mono text-slate-300 bg-slate-800 py-3 rounded-lg border border-slate-700 shadow-md">
+                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-teal-400 font-bold">Window Size:</span> 60s</span>
+                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-rose-400 font-bold">Step Size:</span> 5s</span>
+                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-amber-400 font-bold">Overlap:</span> 55s</span>
+                                <span class="bg-slate-900 px-3 py-1 rounded"><span class="text-sky-400 font-bold">Shape:</span> (Window × Time Step × Feature)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-2-2', 'Gambar_2_2_Sliding_Window')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.2)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Target 2.3: CNN-LSTM -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-2-3" class="figure-content bg-white p-10 rounded-2xl border border-slate-100 shadow-sm min-w-max flex flex-col justify-center">
+                            <div class="text-center text-lg font-bold text-slate-700 mb-8 mt-2">Arsitektur Hybrid CNN-LSTM untuk Klasifikasi Stres Perawat</div>
+                            <div class="flex flex-row items-center justify-center gap-4 px-4 w-full">
+                                
+                                <!-- Input Block -->
+                                <div class="flex flex-col items-center justify-center z-10 shrink-0">
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 h-4">Input</div>
+                                    <div class="bg-slate-200 border border-slate-400 px-4 py-3 rounded-lg text-slate-800 text-center shadow-sm text-xs">
+                                        <span class="font-bold text-sm">Input Tensor</span><br>(60x6)
+                                    </div>
+                                </div>
+
+                                <div class="text-slate-400 font-black text-lg mt-[1.3rem] shrink-0">→</div>
+                                
+                                <!-- CNN Feature Extraction Block -->
+                                <div class="flex flex-col items-center bg-teal-50/50 border-2 border-dashed border-teal-300 p-4 rounded-xl z-10">
+                                    <div class="text-[10px] font-bold text-teal-600 uppercase tracking-widest mb-2 h-4">[ CNN Feature Extraction ]</div>
+                                    
+                                    <div class="flex flex-row items-center gap-4">
+                                        <!-- Conv1D 1 -->
+                                        <div class="bg-white border border-teal-400 p-2 rounded-lg text-center shadow-sm flex flex-col gap-1 w-[120px]">
+                                            <div class="bg-teal-100 border border-teal-300 px-2 py-1 rounded text-teal-800 text-xs font-bold">Conv1D (32)</div>
+                                            <div class="bg-teal-50 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
+                                            <div class="bg-teal-50 px-2 py-1 rounded text-teal-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
+                                            <div class="bg-rose-50 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout(0.3)</div>
+                                        </div>
+                                        
+                                        <div class="text-teal-400 font-black text-lg shrink-0">→</div>
+                                        
+                                        <!-- Conv1D 2 -->
+                                        <div class="bg-white border border-sky-400 p-2 rounded-lg text-center shadow-sm flex flex-col gap-1 w-[120px]">
+                                            <div class="bg-sky-100 border border-sky-300 px-2 py-1 rounded text-sky-800 text-xs font-bold">Conv1D (64)</div>
+                                            <div class="bg-sky-50 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">BatchNorm</div>
+                                            <div class="bg-sky-50 px-2 py-1 rounded text-sky-700 text-[10px] font-mono flex items-center justify-center">MaxPool</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-slate-400 font-black text-lg shrink-0 mt-[1.3rem]">→</div>
+
+                                <!-- Temporal Learning Block -->
+                                <div class="flex flex-col items-center bg-indigo-50/50 border-2 border-dashed border-indigo-300 p-4 rounded-xl z-10 shrink-0">
+                                    <div class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2 h-4">[ Temporal Learning ]</div>
+                                    
+                                    <div class="bg-white border border-indigo-400 p-2 rounded-lg text-center shadow-sm flex flex-col gap-1 w-[120px]">
+                                        <div class="bg-indigo-100 border border-indigo-300 px-2 py-2 rounded text-indigo-800 text-xs font-bold">LSTM (32)</div>
+                                        <div class="bg-rose-50 px-2 py-1 rounded text-rose-700 text-[10px] font-mono flex items-center justify-center">Dropout(0.5)</div>
+                                    </div>
+                                </div>
+
+                                <div class="text-slate-400 font-black text-lg shrink-0 mt-[1.3rem]">→</div>
+
+                                <!-- Classification Block -->
+                                <div class="flex flex-col items-center bg-amber-50/50 border-2 border-dashed border-amber-300 p-4 rounded-xl z-10 shrink-0">
+                                    <div class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-2 h-4">[ Classification Block ]</div>
+                                    
+                                    <div class="flex flex-row items-center gap-4">
+                                        <div class="bg-amber-100 border border-amber-400 px-4 py-4 rounded-lg text-amber-900 text-center shadow-sm text-xs">
+                                            <span class="font-bold text-sm">Dense</span><br>(16)
+                                        </div>
+                                        
+                                        <div class="text-amber-400 font-black text-lg shrink-0">→</div>
+                                        
+                                        <div class="bg-emerald-100 border border-emerald-500 px-5 py-4 rounded-full text-emerald-900 text-center shadow-md text-xs font-bold">
+                                            Output Sigmoid<br><span class="font-normal">(1 Neuron)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-2-3', 'Gambar_2_3_CNN_LSTM_FullScale')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.3)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Target 2.4: System Architecture -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-2-4" class="figure-content bg-white rounded-2xl border border-slate-100 shadow-sm py-12 flex flex-col justify-center items-center min-w-max w-full px-12">
+                            <div class="flex flex-col items-center min-w-[600px] px-8">
+                                
+                                <div class="fc-node fc-node-input bg-slate-50">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Input Skenario</div>
+                                    Pilih ID Subjek
+                                </div>
+                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+                                
+                                <div class="fc-node fc-node-input bg-slate-50">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Konfigurasi</div>
+                                    Pilih Window Pengamatan
+                                </div>
+                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                                <div class="fc-node fc-node-process bg-sky-50">
+                                    <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Back-End</div>
+                                    Load Model CNN-LSTM (.keras)
+                                </div>
+                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                                <div class="fc-node fc-node-process bg-sky-50 shadow-md border-sky-400">
+                                    <div class="text-[10px] text-sky-600 font-bold uppercase tracking-widest mb-1">Komputasi</div>
+                                    Inferensi CNN-LSTM
+                                </div>
+                                <div class="fc-line-v"><div class="fc-arrow-down absolute -bottom-2 -left-[5px]"></div></div>
+
+                                <div class="fc-node bg-amber-50 border-amber-300 shadow-sm">
+                                    <div class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-1">Analitik</div>
+                                    Perhitungan Stress Score
+                                </div>
+                                
+                                <div class="w-2 h-6 bg-slate-300"></div>
+                                <div class="w-[360px] h-1 bg-slate-300 relative">
+                                    <div class="absolute -left-0.5 top-0 w-1 h-6 bg-slate-300"></div>
+                                    <div class="absolute -right-0.5 top-0 w-1 h-6 bg-slate-300"></div>
+                                </div>
+
+                                <div class="flex justify-between w-[580px] mt-6 gap-8">
+                                    <div class="flex flex-col items-center w-1/2">
+                                        <div class="fc-arrow-down mb-1"></div>
+                                        <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
+                                            <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 1</div>
+                                            Stress Score &<br>Status Klasifikasi<br>
+                                            <span class="text-xs font-normal opacity-70 mt-1 inline-block">(Normal / High Stress)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-center w-1/2">
+                                        <div class="fc-arrow-down mb-1"></div>
+                                        <div class="fc-node fc-node-output bg-emerald-50 text-emerald-800 shadow-md h-full flex flex-col justify-center">
+                                            <div class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Output 2</div>
+                                            Visualisasi<br>Sinyal Fisiologis<br>
+                                            <span class="text-xs font-normal opacity-70 mt-1 inline-block">(HR, EDA, TEMP)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-2-4', 'Gambar_2_4_Dashboard_Workflow')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 2.4)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Export Target 3.4: Accuracy Chart -->
+                <div class="figure-wrapper bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <div id="export-target-full-3-4" class="figure-content bg-white p-8 rounded-xl border border-slate-100 shadow-sm w-full min-w-[700px]">
+                            <div class="mb-6 text-center">
+                                <h3 class="text-lg font-bold text-slate-800">Perbandingan Kinerja CNN-LSTM pada Empat Skenario Pengujian</h3>
+                                <p class="text-xs text-slate-500 mt-1">Metrik Accuracy (%) berdasarkan hasil eksperimen terkini.</p>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <canvas id="accuracyChartExport"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadFigure('export-target-full-3-4', 'Gambar_3_4_Komparasi_Akurasi')" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-xl text-sm font-bold shadow-md inline-flex items-center gap-2 transition">
+                            <span class="text-xl">⬇️</span> Download PNG (Gambar 3.4)
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- INTERACTION LOGIC & INDIVIDUAL EXPORT LOGIC -->
+    <script>
+        async function downloadFigure(id, filename) {
+            const target = document.getElementById(id);
+            const originalBg = target.style.backgroundColor;
+            
+            target.style.backgroundColor = "#ffffff"; 
+
+            try {
+                await new Promise(r => setTimeout(r, 100));
+
+                const canvas = await html2canvas(target, {
+                    scale: 4,
+                    backgroundColor: "#ffffff",
+                    useCORS: true,
+                    width: target.scrollWidth,
+                    height: target.scrollHeight,
+                    windowWidth: target.scrollWidth + 100
+                });
+
+                const link = document.createElement("a");
+                link.download = filename + ".png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            } catch (err) {
+                console.error("Export failed:", err);
+                alert("Gagal melakukan export gambar.");
+            } finally {
+                target.style.backgroundColor = originalBg; 
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const stepBtns = document.querySelectorAll('.step-btn');
+            const stepContents = document.querySelectorAll('.step-content');
+
+            stepBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetStep = btn.getAttribute('data-step');
+                    
+                    stepBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-teal-700', 'text-white', 'border-teal-700', 'shadow-md');
+                        b.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-50');
+                    });
+                    stepContents.forEach(c => {
+                        c.classList.add('hidden');
+                        c.classList.remove('block');
+                    });
+
+                    btn.classList.add('active', 'bg-teal-700', 'text-white', 'border-teal-700', 'shadow-md');
+                    btn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-50');
+                    document.getElementById(`step-content-${targetStep}`).classList.remove('hidden');
+                    document.getElementById(`step-content-${targetStep}`).classList.add('block');
+                });
+            });
+
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // Chart inside narrative
+            const ctxAcc = document.getElementById('accuracyChart').getContext('2d');
+            const accChartConfig = {
+                type: 'bar',
+                data: {
+                    labels: ['Multiclass Independent', 'Multiclass Dependent', 'Binary Independent', 'Binary Dependent'],
+                    datasets: [{
+                        label: 'Akurasi Model (%)',
+                        data: [54, 79, 65, 89],
+                        backgroundColor: ['#cbd5e1', '#94a3b8', '#64748b', '#0f766e'],
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            callbacks: { label: (c) => ` Akurasi: ${c.raw}%` }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' }, title: {display: true, text: 'Akurasi (%)'} },
+                        x: { grid: { display: false }, ticks: { font: { weight: '600' } } }
+                    }
+                }
+            };
+            new Chart(ctxAcc, accChartConfig);
+
+            // Chart inside export section
+            const ctxAccExport = document.getElementById('accuracyChartExport').getContext('2d');
+            new Chart(ctxAccExport, accChartConfig);
+
+
+            const ctxSim = document.getElementById('simChart').getContext('2d');
+            const dataLen = 40;
+            let simData = Array(dataLen).fill(72);
+            let simLabels = Array.from({length: dataLen}, (_, i) => i);
+            
+            const simChart = new Chart(ctxSim, {
+                type: 'line',
+                data: {
+                    labels: simLabels,
+                    datasets: [{
+                        label: 'HR (BPM)',
+                        data: simData,
+                        borderColor: '#14b8a6', 
+                        backgroundColor: 'rgba(20, 184, 166, 0.15)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 }, 
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        y: { min: 60, max: 140, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { display: false }
+                    }
+                }
+            });
+
+            let isSimRunning = false;
+            let isStressed = false;
+            let simTimer;
+            const baseHR = 72;
+            const baseTemp = 36.5;
+
+            const btnToggleSim = document.getElementById('btn-toggle-sim');
+            const btnInjectStress = document.getElementById('btn-inject-stress');
+            const connStatus = document.getElementById('conn-status');
+            const valHr = document.getElementById('dash-hr');
+            const valTemp = document.getElementById('dash-temp');
+            const dashStatus = document.getElementById('dash-status');
+            const dashScore = document.getElementById('dash-score');
+            const scoreBar = document.getElementById('score-bar');
+            const alertOverlay = document.getElementById('alert-overlay');
+            const statusBg = document.getElementById('status-bg');
+
+            btnToggleSim.addEventListener('click', () => {
+                if (!isSimRunning) {
+                    isSimRunning = true;
+                    btnToggleSim.textContent = '⏹ Hentikan Inferensi';
+                    btnToggleSim.classList.replace('bg-teal-600', 'bg-slate-700');
+                    btnToggleSim.classList.replace('hover:bg-teal-500', 'hover:bg-slate-600');
+                    
+                    btnInjectStress.disabled = false;
+                    btnInjectStress.classList.replace('opacity-40', 'opacity-100');
+                    btnInjectStress.classList.replace('cursor-not-allowed', 'cursor-pointer');
+                    
+                    connStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Memproses Sinyal`;
+
+                    simTimer = setInterval(() => {
+                        let nextHr, nextTemp, score;
+                        
+                        if (isStressed) {
+                            nextHr = 115 + (Math.random() * 15);
+                            nextTemp = baseTemp - (Math.random() * 0.8); 
+                            score = 0.85 + Math.random() * 0.12; 
+                            
+                            simChart.data.datasets[0].borderColor = '#fb7185';
+                            simChart.data.datasets[0].backgroundColor = 'rgba(244, 63, 94, 0.2)';
+                            
+                            dashStatus.textContent = 'HIGH STRESS';
+                            dashStatus.className = 'text-2xl font-black text-rose-400 z-10';
+                            statusBg.className = 'absolute inset-0 bg-rose-900/40 opacity-100 transition-opacity duration-300';
+                            
+                            scoreBar.className = 'bg-rose-500 h-full transition-all duration-300';
+                            alertOverlay.classList.remove('opacity-0');
+                            
+                        } else {
+                            nextHr = baseHR + (Math.random() * 6 - 3);
+                            nextTemp = baseTemp + (Math.random() * 0.3 - 0.1); 
+                            score = 0.1 + Math.random() * 0.2; 
+                            
+                            simChart.data.datasets[0].borderColor = '#14b8a6'; 
+                            simChart.data.datasets[0].backgroundColor = 'rgba(20, 184, 166, 0.15)';
+                            
+                            dashStatus.textContent = 'NORMAL';
+                            dashStatus.className = 'text-2xl font-black text-emerald-400 z-10';
+                            statusBg.className = 'absolute inset-0 bg-emerald-900/20 opacity-100 transition-opacity duration-300';
+                            
+                            scoreBar.className = 'bg-emerald-500 h-full transition-all duration-300';
+                            alertOverlay.classList.add('opacity-0');
+                        }
+
+                        valHr.textContent = Math.round(nextHr);
+                        valTemp.textContent = nextTemp.toFixed(1);
+                        dashScore.textContent = score.toFixed(2);
+                        scoreBar.style.width = `${score * 100}%`;
+
+                        simData.push(nextHr);
+                        simData.shift();
+                        simChart.update();
+
+                    }, 400);
+
+                } else {
+                    isSimRunning = false;
+                    isStressed = false;
+                    clearInterval(simTimer);
+                    
+                    btnToggleSim.textContent = '▶ Mulai Inferensi';
+                    btnToggleSim.classList.replace('bg-slate-700', 'bg-teal-600');
+                    btnToggleSim.classList.replace('hover:bg-slate-600', 'hover:bg-teal-500');
+                    
+                    btnInjectStress.disabled = true;
+                    btnInjectStress.classList.replace('opacity-100', 'opacity-40');
+                    btnInjectStress.classList.replace('cursor-pointer', 'cursor-not-allowed');
+                    
+                    connStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500"></span> Sistem Menunggu`;
+
+                    valHr.textContent = '--';
+                    valTemp.textContent = '--';
+                    dashScore.textContent = '0.00';
+                    scoreBar.style.width = '0%';
+                    
+                    dashStatus.textContent = 'STANDBY';
+                    dashStatus.className = 'text-2xl font-black text-slate-500 z-10';
+                    statusBg.className = 'absolute inset-0 opacity-0 transition-opacity duration-300';
+                    alertOverlay.classList.add('opacity-0');
+                }
+            });
+
+            btnInjectStress.addEventListener('click', () => {
+                if(!isStressed && isSimRunning) {
+                    isStressed = true;
+                    btnInjectStress.textContent = "⚠ Merekam Lonjakan...";
+                    btnInjectStress.classList.replace('text-rose-400', 'text-white');
+                    btnInjectStress.classList.replace('border-rose-500/50', 'border-rose-500');
+                    btnInjectStress.classList.add('bg-rose-600');
+                    
+                    setTimeout(() => {
+                        isStressed = false;
+                        btnInjectStress.textContent = "Picukan Lonjakan Stres";
+                        btnInjectStress.classList.replace('text-white', 'text-rose-400');
+                        btnInjectStress.classList.replace('border-rose-500', 'border-rose-500/50');
+                        btnInjectStress.classList.remove('bg-rose-600');
+                    }, 4500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

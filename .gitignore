@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+venv/
+
+# Dataset besar
+X_vektor_60s.npy
+groups_id.npy
+y_labels.npy
+
+# Training artifacts
+*.h5
+
+# OS
+.DS_Store
+Thumbs.db
