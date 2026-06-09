@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-VISS: Automated Vital Intelligence</title>
+    
+    <!-- Production-Ready Metadata & Favicon Integration -->
+    <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0E1117" media="(prefers-color-scheme: dark)">
+    <meta name="description" content="A-VISS: AI-powered stress surveillance for healthcare professionals using Subject-Dependent CNN-LSTM.">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="A-VISS: Automated Vital Intelligence">
+    <meta property="og:description" content="Personalized AI for ICU professionals. Combating alarm fatigue through Subject-Dependent CNN-LSTM intelligence.">
+    <meta property="og:image" content="assets/A-VISS.png">
+    <meta property="og:url" content="https://avissproject.streamlit.app/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="A-VISS: Automated Vital Intelligence">
+    <meta name="twitter:description" content="Personalized AI for ICU professionals. Combating alarm fatigue through Subject-Dependent CNN-LSTM intelligence.">
+    <meta name="twitter:image" content="assets/A-VISS.png">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/A-VISS.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/A-VISS.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/A-VISS.png">
+    <link rel="canonical" href="https://avissproject.streamlit.app/">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+    <style>
+        /* Premium Apple-Style Design System */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --bg-main: #FFFFFF;
+            --bg-sec: #F5F5F7;
+            --text-primary: #1D1D1F;
+            --text-secondary: #6E6E73;
+            --accent: #0F766E;
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --glass-bg-dark: rgba(30, 30, 32, 0.4);
+            --glass-bg-light: rgba(255, 255, 255, 0.6);
+            /* Streamlit specific colors for consistency */
+            --st-primary: #FF4B4B;
+            --st-bg: #FFFFFF;
+            --st-sidebar: #F0F2F6;
+            --st-text: #31333F;
+        }
+
+        body {
+            background-color: #0E1117; 
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Typography Adjustments */
+        h1, h2, h3, h4 {
+            letter-spacing: -0.03em;
+        }
+
+        /* Performance Optimized Ambient Global Lighting */
+        .ambient-glow-teal {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(15, 118, 110, 0.12) 0%, rgba(15, 118, 110, 0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            pointer-events: none;
+            will-change: transform;
+            transform: translateZ(0); /* Hardware acceleration */
+        }
+
+        .ambient-glow-white {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            pointer-events: none;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        /* True Liquid Glass System */
+        .liquid-glass-dark {
+            background: var(--glass-bg-dark);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .liquid-glass-light {
+            background: var(--glass-bg-light);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
+            border-left: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        /* VisionOS Floating Navbar */
+        .nav-capsule {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            border-radius: 9999px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .dark-mode .nav-capsule {
+            background: rgba(30, 30, 32, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Branding Logo Presentation */
+        .logo-shadow {
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.08));
+        }
+        
+        .dark-mode .logo-shadow {
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--text-primary);
+            color: #FFFFFF;
+            border-radius: 9999px;
+            padding: 14px 32px;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+        @media (min-width: 768px) {
+            .btn-primary { padding: 16px 36px; font-size: 17px; }
+        }
+        .dark-mode .btn-primary { background-color: #FFFFFF; color: var(--text-primary); }
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 9999px;
+            padding: 14px 32px;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @media (min-width: 768px) {
+            .btn-secondary { padding: 16px 36px; font-size: 17px; }
+        }
+        .dark-mode .btn-secondary { color: #FFFFFF; border: 1px solid rgba(255,255,255,0.2); background: rgba(255, 255, 255, 0.05); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.2); }
+        .dark-mode .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255,255,255,0.4); }
+
+        /* Asset Presentation Wrappers */
+        .asset-crop-wrapper {
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border-radius: inherit;
+        }
+        .asset-zoomed {
+            transform: scale(2.2); 
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Chart constraints */
+        .chart-container { position: relative; width: 100%; height: 300px; }
+        @media (max-width: 768px) { .chart-container { height: 250px; } }
+
+        /* Scroll Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+        
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .scale-in.visible { opacity: 1; transform: scale(1); }
+
+        /* Sticky Showcase */
+        .sticky-wrapper { position: sticky; top: 100px; }
+        @media (min-width: 1024px) { .sticky-wrapper { top: 140px; } }
+
+        /* Mesh Backgrounds */
+        .mesh-bg {
+            background-color: #0E1117;
+            background-image: 
+                radial-gradient(at 20% 0%, hsla(175,100%,15%,0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 100%, hsla(180,100%,10%,0.3) 0px, transparent 50%);
+        }
+        .mesh-bg-light {
+            background-color: #F5F5F7;
+            background-image: 
+                radial-gradient(at 100% 0%, hsla(175,50%,90%,0.5) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(200,50%,95%,0.5) 0px, transparent 50%);
+        }
+
+        /* Streamlit UI Colors */
+        .st-success { background-color: #D4EDDA; color: #155724; border: 1px solid #C3E6CB; }
+        .st-error { background-color: #F8D7DA; color: #721C24; border: 1px solid #F5C6CB; }
+        .st-sidebar { background-color: var(--st-sidebar); }
+        .st-main { background-color: var(--st-bg); }
+        .st-text { color: var(--st-text); }
+        .st-primary-btn { background-color: var(--st-primary); color: white; border: 1px solid var(--st-primary); }
+        .st-primary-btn:hover { background-color: #ff3333; border-color: #ff3333; }
+        .st-secondary-btn { background-color: white; color: var(--st-text); border: 1px solid rgba(49, 51, 63, 0.2); }
+        .st-secondary-btn:hover { border-color: var(--st-primary); color: var(--st-primary); }
+
+        /* Custom scrollbar for timeline log */
+        #prediction-log::-webkit-scrollbar { width: 4px; }
+        #prediction-log::-webkit-scrollbar-track { background: transparent; }
+        #prediction-log::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+        
+        /* Mobile Typography Scaling */
+        .text-dynamic-h1 { font-size: 2.75rem; line-height: 1.1; }
+        .text-dynamic-h2 { font-size: 2.25rem; line-height: 1.1; }
+        @media (min-width: 768px) {
+            .text-dynamic-h1 { font-size: 4.5rem; line-height: 1.0; }
+            .text-dynamic-h2 { font-size: 4rem; line-height: 1.0; }
+        }
+        @media (min-width: 1024px) {
+            .text-dynamic-h1 { font-size: 5.5rem; line-height: 0.95; }
+            .text-dynamic-h2 { font-size: 5rem; }
+        }
+
+        /* Subtle Fade Keyframes */
+        @keyframes subtle-fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-subtle-fade {
+            animation: subtle-fade 2s ease-in-out infinite;
+        }
+
+    </style>
+</head>
+<body class="bg-[#F5F5F7]">
+
+    <!-- VISION OS STYLE FLOATING NAVIGATION -->
+    <div class="fixed top-4 md:top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none transition-all duration-500" id="nav-container">
+        <nav class="pointer-events-auto nav-capsule px-4 md:px-6 py-2 md:py-3 flex items-center justify-between gap-4 md:gap-12 w-full md:w-auto md:min-w-[700px]" aria-label="Main Navigation">
+            <div class="font-bold text-base md:text-lg tracking-tight flex items-center gap-2.5 cursor-pointer transition text-[#1D1D1F] nav-text" onclick="window.scrollTo(0,0)" role="button" tabindex="0" aria-label="Scroll to top">
+                <img src="assets/A-VISS.png" alt="A-VISS Logo" class="h-7 md:h-8 w-auto object-contain transition-all duration-500 logo-shadow">
+                A-VISS
+            </div>
+            <div class="hidden md:flex space-x-8 text-[14px] font-medium opacity-80 text-[#1D1D1F] nav-text">
+                <a href="#human" class="hover:opacity-60 transition" aria-label="Go to Clinical Context">Context</a>
+                <a href="#personalization" class="hover:opacity-60 transition" aria-label="Go to Methodology">Methodology</a>
+                <a href="#results" class="hover:opacity-60 transition" aria-label="Go to Validation Results">Validation</a>
+                <a href="#dashboard" class="hover:opacity-60 transition" aria-label="Go to Product Dashboard">Product</a>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="Draft Skripsi-Jonathan Kwan.pdf" download class="hidden sm:flex text-[12px] font-medium text-[#1D1D1F] opacity-70 hover:opacity-100 transition nav-text items-center gap-1" aria-label="Download Thesis PDF">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Thesis
+                </a>
+                <a href="#simulation" class="bg-black/5 text-[#1D1D1F] border border-black/10 text-[12px] md:text-[13px] font-semibold px-4 md:px-5 py-2 rounded-full hover:bg-black/10 transition nav-btn shadow-sm whitespace-nowrap" aria-label="Try Dashboard Simulation">
+                    Simulation
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 1. HERO SECTION -->
+    <section class="pt-32 md:pt-40 pb-20 md:pb-32 px-4 text-center mesh-bg-light min-h-[100vh] flex flex-col items-center justify-start relative overflow-hidden" aria-label="Hero">
+        
+        <div class="ambient-glow-white top-[0%] left-[20%]"></div>
+        
+        <div class="max-w-5xl mx-auto fade-up visible z-10 relative mt-4 md:mt-8 w-full">
+            <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-xl border border-white/80 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold tracking-widest uppercase mb-6 md:mb-8 text-[#1D1D1F]/80 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+                <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Academic Research Showcase
+            </div>
+            
+            <h1 class="text-dynamic-h1 font-bold text-[#1D1D1F] mb-6 tracking-tighter">
+                Not Every Elevated <br class="hidden sm:block">Heart Rate Means Stress.
+            </h1>
+            <p class="text-lg md:text-xl lg:text-2xl text-[#6E6E73] font-medium max-w-3xl mx-auto mb-10 tracking-tight px-4">
+                A-VISS learns the person behind the signal. Combating ICU alarm fatigue through personalized, Subject-Dependent CNN-LSTM intelligence.
+            </p>
+            
+            <!-- Premium Metric Row -->
+            <div class="flex flex-wrap justify-center items-center gap-6 md:gap-12 mb-12">
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold text-[#1D1D1F] tracking-tighter">18</div>
+                    <div class="text-[9px] md:text-[11px] font-semibold text-[#6E6E73] uppercase tracking-widest mt-1">Nurse Participants</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold text-[#1D1D1F] tracking-tighter">11.5M+</div>
+                    <div class="text-[9px] md:text-[11px] font-semibold text-[#6E6E73] uppercase tracking-widest mt-1">Physiological Records</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl md:text-3xl font-bold text-[#0F766E] tracking-tighter">85%</div>
+                    <div class="text-[9px] md:text-[11px] font-semibold text-[#6E6E73] uppercase tracking-widest mt-1">Accuracy</div>
+                </div>
+                <div class="text-center hidden sm:block">
+                    <div class="text-2xl md:text-3xl font-bold text-emerald-600 tracking-tighter">86%</div>
+                    <div class="text-[9px] md:text-[11px] font-semibold text-[#6E6E73] uppercase tracking-widest mt-1">Weighted F1 Score</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4 md:gap-5 mb-16 px-4">
+                <a href="#dashboard" class="btn-primary w-full sm:w-auto">Explore Dashboard</a>
+                <a href="#alarm" class="btn-secondary w-full sm:w-auto">Discover the Science</a>
+            </div>
+        </div>
+
+        <!-- Premium Hero Dashboard Visual (Real Streamlit Screenshot) -->
+        <div class="w-full max-w-5xl mx-auto relative z-10 fade-up visible scale-in asset-frame mt-2 md:mt-4 px-4 md:px-0">
+            <div class="absolute inset-0 bg-white/40 blur-2xl rounded-[32px] transform translate-y-4 scale-100 -z-10"></div>
+            
+            <div class="liquid-glass-light rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-[0_20px_40px_rgba(0,0,0,0.08)] asset-content border border-white/60">
+                <div class="bg-white rounded-[16px] md:rounded-[24px] overflow-hidden border border-gray-200 shadow-sm relative aspect-[16/10] md:aspect-[16/9]">
+                    <!-- Mac-like Window bar -->
+                    <div class="h-8 md:h-10 bg-gray-50 flex items-center px-4 gap-1.5 md:gap-2 border-b border-gray-100 w-full absolute top-0 z-20">
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-[#FF5F56] border border-black/5"></div>
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-[#FFBD2E] border border-black/5"></div>
+                        <div class="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-[#27C93F] border border-black/5"></div>
+                        <div class="mx-auto text-[10px] md:text-xs font-semibold text-gray-500 tracking-wide font-mono">avissproject.streamlit.app</div>
+                    </div>
+                    
+                    <!-- Real Streamlit Screenshot -->
+                    <div class="w-full h-full pt-8 md:pt-10 bg-[#FFFFFF]">
+                        <img src="assets/dashboard.png" alt="A-VISS Streamlit Dashboard interface showing stress prediction metrics" class="w-full h-full object-cover object-top opacity-95">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. THE HUMAN CONNECTION -->
+    <section id="human" class="py-32 md:py-40 bg-[#0E1117] px-6 text-center flex flex-col justify-center min-h-[50vh] md:min-h-[70vh] relative overflow-hidden" aria-label="Human Impact">
+        <div class="max-w-4xl mx-auto space-y-8 md:space-y-12 relative z-10">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-medium text-white/30 fade-up tracking-tight">Behind every signal is a healthcare professional.</h2>
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-medium text-white/60 fade-up tracking-tight" style="transition-delay: 0.1s">Behind every alert is a decision.</h2>
+            <h2 class="text-3xl md:text-5xl lg:text-6xl font-semibold text-white fade-up tracking-tighter" style="transition-delay: 0.2s">Behind every decision is a patient.</h2>
+        </div>
+    </section>
+
+    <!-- 3. ALARM FATIGUE NARRATIVE -->
+    <section id="alarm" class="py-32 md:py-48 bg-white px-6 relative overflow-hidden" aria-label="The Clinical Problem">
+        <div class="max-w-5xl mx-auto text-center">
+            
+            <div class="fade-up mb-20 md:mb-32">
+                <div class="text-[60px] md:text-[100px] lg:text-[140px] font-black tracking-tighter text-gray-100 leading-none mb-4 md:mb-6 animate-subtle-fade" aria-hidden="true">BEEP. BEEP.</div>
+                <h2 class="text-dynamic-h2 font-bold tracking-tighter text-[#1D1D1F] mb-6 md:mb-8">
+                    When every alarm matters,<br>
+                    <span class="text-rose-500">too many become noise.</span>
+                </h2>
+                <p class="text-lg md:text-2xl text-[#6E6E73] font-medium max-w-3xl mx-auto leading-relaxed">
+                    A-VISS isolates meaningful physiological stress signals, cutting through the cognitive overload of critical care environments.
+                </p>
+            </div>
+
+            <!-- Visual Steps -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-left">
+                <div class="fade-up p-8 md:p-10 rounded-[32px] md:rounded-[40px] bg-[#F5F5F7] border border-gray-100">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center text-lg md:text-xl shadow-sm mb-6 border border-gray-200" aria-hidden="true">🏥</div>
+                    <h3 class="text-xl md:text-2xl font-bold text-[#1D1D1F] mb-3 md:mb-4 tracking-tight">ICU Pressure</h3>
+                    <p class="text-[#6E6E73] text-sm md:text-base leading-relaxed">Healthcare workers operate under immense pressure, continuously monitoring dozens of critical patients.</p>
+                </div>
+                <div class="fade-up p-8 md:p-10 rounded-[32px] md:rounded-[40px] bg-rose-50 border border-rose-100" style="transition-delay: 0.1s">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center text-lg md:text-xl shadow-sm mb-6 border border-rose-200" aria-hidden="true">⚠️</div>
+                    <h3 class="text-xl md:text-2xl font-bold text-rose-600 mb-3 md:mb-4 tracking-tight">Continuous Alarms</h3>
+                    <p class="text-rose-600/80 text-sm md:text-base leading-relaxed">Global thresholds trigger harsh warnings for every minor, natural physiological shift.</p>
+                </div>
+                <div class="fade-up p-8 md:p-10 rounded-[32px] md:rounded-[40px] bg-[#1D1D1F] border border-gray-800" style="transition-delay: 0.2s">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-full flex items-center justify-center text-lg md:text-xl shadow-sm mb-6 border border-white/20" aria-hidden="true">🧠</div>
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4 tracking-tight">Alarm Fatigue</h3>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed">Cognitive overload leads to desensitization. Slowly, critical and true alerts are ignored.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. WHY PERSONALIZATION CHANGES EVERYTHING (Central Argument) -->
+    <section id="personalization" class="py-32 md:py-48 bg-[#F5F5F7] px-6 relative overflow-hidden" aria-label="Personalization Argument">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="text-center mb-16 md:mb-24 fade-up">
+                <h2 class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-[#1D1D1F] mb-6 leading-tight">Why Personalization <br class="hidden sm:block">Changes Everything.</h2>
+                <p class="text-lg md:text-2xl text-[#6E6E73] font-medium max-w-3xl mx-auto leading-relaxed">Traditional systems use universal thresholds. But human physiology is deeply personal.</p>
+            </div>
+            
+            <!-- Split Comparison -->
+            <div class="grid md:grid-cols-2 gap-6 lg:gap-12 items-stretch fade-up">
+                
+                <!-- Traditional -->
+                <div class="bg-white rounded-[32px] md:rounded-[48px] p-8 md:p-10 lg:p-14 shadow-sm border border-gray-200/60 flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 md:h-2 bg-gray-200"></div>
+                    <h3 class="text-xl md:text-2xl font-bold text-[#86868B] mb-8 md:mb-10 text-center tracking-tight">Global Threshold System</h3>
+                    
+                    <div class="flex justify-between items-center mb-8 md:mb-10 pb-8 md:pb-10 border-b border-gray-100">
+                        <div>
+                            <div class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Nurse A</div>
+                            <div class="text-4xl md:text-5xl font-bold text-[#1D1D1F] tracking-tighter">95 <span class="text-lg md:text-xl text-gray-400 tracking-normal font-medium">BPM</span></div>
+                            <div class="text-xs md:text-sm text-gray-500 mt-1 md:mt-2 font-medium">Natural Resting HR</div>
+                        </div>
+                        <div class="bg-rose-100 border border-rose-200 text-rose-700 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full font-bold text-[10px] md:text-xs uppercase tracking-widest">False Alarm</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Nurse B</div>
+                            <div class="text-4xl md:text-5xl font-bold text-[#1D1D1F] tracking-tighter">68 <span class="text-lg md:text-xl text-gray-400 tracking-normal font-medium">BPM</span></div>
+                            <div class="text-xs md:text-sm text-gray-500 mt-1 md:mt-2 font-medium">Natural Resting HR</div>
+                        </div>
+                        <div class="bg-gray-100 border border-gray-200 text-gray-500 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full font-bold text-[10px] md:text-xs uppercase tracking-widest">Normal</div>
+                    </div>
+                </div>
+
+                <!-- A-VISS Subject-Dependent -->
+                <div class="liquid-glass-light rounded-[32px] md:rounded-[48px] p-8 md:p-10 lg:p-14 shadow-[0_20px_60px_rgba(15,118,110,0.1)] border border-white flex flex-col relative overflow-hidden h-full">
+                    <div class="absolute top-0 left-0 w-full h-1.5 md:h-2 bg-gradient-to-r from-[#0F766E] to-teal-400"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/80 to-teal-50/40 z-0"></div>
+                    
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h3 class="text-xl md:text-2xl font-bold text-[#0F766E] mb-8 md:mb-10 text-center tracking-tight">A-VISS Subject-Dependent</h3>
+                        
+                        <div class="flex justify-between items-center mb-8 md:mb-10 pb-8 md:pb-10 border-b border-teal-100/50">
+                            <div>
+                                <div class="text-xs md:text-sm font-bold text-teal-600/60 uppercase tracking-widest mb-1">Nurse A</div>
+                                <div class="text-4xl md:text-5xl font-bold text-[#0F766E] tracking-tighter">95 <span class="text-lg md:text-xl text-teal-600/50 tracking-normal font-medium">BPM</span></div>
+                                <div class="text-xs md:text-sm text-teal-600/70 mt-1 md:mt-2 font-medium">Learned Baseline</div>
+                            </div>
+                            <div class="bg-emerald-100 border border-emerald-200 text-emerald-700 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full font-bold text-[10px] md:text-xs uppercase tracking-widest">Normal</div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-xs md:text-sm font-bold text-teal-600/60 uppercase tracking-widest mb-1">Nurse B</div>
+                                <div class="text-4xl md:text-5xl font-bold text-[#1D1D1F] tracking-tighter">110 <span class="text-lg md:text-xl text-gray-500 tracking-normal font-medium">BPM</span></div>
+                                <div class="text-xs md:text-sm text-rose-500/80 mt-1 md:mt-2 font-medium">Abnormal Spike</div>
+                            </div>
+                            <div class="bg-rose-500 text-white shadow-[0_4px_10px_rgba(244,63,94,0.3)] md:shadow-[0_4px_15px_rgba(244,63,94,0.4)] px-3 py-1.5 md:px-5 md:py-2.5 rounded-full font-bold text-[10px] md:text-xs uppercase tracking-widest text-center leading-tight">True<br class="block sm:hidden"> Stress</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. THE WOW MOMENT (Signals to Intelligence) -->
+    <section id="wow" class="py-32 md:py-48 bg-[#0E1117] px-6 relative overflow-hidden text-center mesh-bg" aria-label="Signals to Intelligence Transformation">
+        <div class="ambient-glow-teal top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 opacity-50 md:opacity-70"></div>
+        
+        <div class="max-w-6xl mx-auto relative z-10 dark-mode">
+            <h2 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white mb-16 md:mb-24 fade-up leading-tight">Signals to Intelligence.</h2>
+            
+            <div class="flex flex-col items-center gap-4 md:gap-6 relative">
+                
+                <!-- Step 1: Signals -->
+                <div class="flex flex-wrap justify-center gap-3 md:gap-4 fade-up w-full">
+                    <div class="liquid-glass-dark px-6 md:px-8 py-3 md:py-5 rounded-full text-white font-medium shadow-lg border border-white/10 text-sm md:text-lg">Heart Rate</div>
+                    <div class="liquid-glass-dark px-6 md:px-8 py-3 md:py-5 rounded-full text-white font-medium shadow-lg border border-white/10 text-sm md:text-lg">EDA</div>
+                    <div class="liquid-glass-dark px-6 md:px-8 py-3 md:py-5 rounded-full text-white font-medium shadow-lg border border-white/10 text-sm md:text-lg">Skin Temp</div>
+                    <div class="liquid-glass-dark px-6 md:px-8 py-3 md:py-5 rounded-full text-white font-medium shadow-lg border border-white/10 text-sm md:text-lg hidden sm:block">Accelerometer</div>
+                </div>
+                
+                <div class="h-12 md:h-20 w-0.5 bg-gradient-to-b from-white/20 to-teal-500/50 fade-up"></div>
+                
+                <!-- Step 2: Baseline -->
+                <div class="liquid-glass-dark px-8 md:px-12 py-4 md:py-5 rounded-full border border-teal-500/30 text-teal-300 font-bold tracking-widest uppercase text-xs md:text-sm fade-up shadow-[0_0_20px_rgba(20,184,166,0.2)]">
+                    Personal Baseline Learning
+                </div>
+                
+                <div class="h-12 md:h-20 w-0.5 bg-gradient-to-b from-teal-500/50 to-indigo-500/50 fade-up"></div>
+                
+                <!-- Step 3: CNN-LSTM -->
+                <div class="bg-gradient-to-r from-teal-600 to-indigo-600 p-[1px] rounded-[32px] md:rounded-[48px] fade-up shadow-[0_0_30px_rgba(99,102,241,0.2)] md:shadow-[0_0_50px_rgba(99,102,241,0.3)] cursor-default mx-4">
+                    <div class="bg-[#0E1117] rounded-[32px] md:rounded-[48px] p-6 md:px-20 md:py-10 flex items-center justify-center gap-4 md:gap-6">
+                        <span class="text-3xl md:text-4xl" aria-hidden="true">🧠</span>
+                        <div class="text-left">
+                            <div class="text-white font-bold text-xl md:text-3xl tracking-tight mb-1">CNN-LSTM Core</div>
+                            <div class="text-gray-400 font-medium text-xs md:text-base">Spatiotemporal Deep Learning</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="h-12 md:h-20 w-0.5 bg-gradient-to-b from-indigo-500/50 to-rose-500/50 fade-up"></div>
+                
+                <!-- Step 4: Insight -->
+                <div class="liquid-glass-dark bg-rose-500/10 border-rose-500/30 px-8 md:px-16 py-6 md:py-8 rounded-[24px] md:rounded-[40px] fade-up shadow-[0_0_30px_rgba(244,63,94,0.15)] mx-4">
+                    <div class="text-rose-400 font-bold text-2xl md:text-4xl tracking-tighter">Stress Prediction Insight</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. THE INTELLIGENCE WORKFLOW (Technical Transformation) -->
+    <section id="intelligence" class="py-32 md:py-40 bg-white px-6 overflow-hidden" aria-label="Research Methodology Workflow">
+        <div class="max-w-7xl mx-auto fade-up">
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tighter text-[#1D1D1F] text-center mb-16 md:mb-24">The Research Methodology</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center text-center asset-frame">
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-[24px] md:rounded-[32px] bg-[#F5F5F7] border border-gray-100 flex items-center justify-center mb-4 md:mb-6 asset-crop-wrapper asset-content shadow-sm p-3">
+                        <img src="assets/Hexagon_Dataset.png" alt="Z-Score Standardization Dataset representation" class="asset-zoomed mix-blend-darken opacity-80">
+                    </div>
+                    <h3 class="text-base md:text-lg font-semibold text-[#1D1D1F] mb-2">Subject Standardization</h3>
+                    <p class="text-[#6E6E73] text-sm leading-relaxed px-4 max-w-[250px]">Z-score normalization transforms raw inputs to isolate personal baseline fluctuations.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center text-center asset-frame">
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-[24px] md:rounded-[32px] bg-[#F5F5F7] border border-gray-100 flex items-center justify-center mb-4 md:mb-6 asset-crop-wrapper asset-content shadow-sm p-3">
+                        <img src="assets/Hexagon_Sliding_Window.png" alt="Sliding window time series slicing" class="asset-zoomed mix-blend-darken opacity-80">
+                    </div>
+                    <h3 class="text-base md:text-lg font-semibold text-[#1D1D1F] mb-2">Sliding Window</h3>
+                    <p class="text-[#6E6E73] text-sm leading-relaxed px-4 max-w-[250px]">Continuous streams are sliced into 60 time steps to generate 3D analytical tensors.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center text-center asset-frame">
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-[24px] md:rounded-[32px] bg-[#F5F5F7] border border-gray-100 flex items-center justify-center mb-4 md:mb-6 asset-crop-wrapper asset-content shadow-sm p-3">
+                         <img src="assets/Hexagon_CNN-LSTM.png" alt="CNN-LSTM Core Architecture diagram" class="asset-zoomed mix-blend-darken opacity-80">
+                    </div>
+                    <h3 class="text-base md:text-lg font-semibold text-[#1D1D1F] mb-2">CNN-LSTM Core</h3>
+                    <p class="text-[#6E6E73] text-sm leading-relaxed px-4 max-w-[250px]">Subject-Dependent training accurately classifies binary stress levels.</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex flex-col items-center text-center asset-frame">
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-[24px] md:rounded-[32px] bg-[#F5F5F7] border border-gray-100 flex items-center justify-center mb-4 md:mb-6 asset-crop-wrapper asset-content shadow-sm p-3">
+                        <!-- Used a clear section of the dashboard or a generic metric image as confusion matrix representation -->
+                        <img src="assets/Confusion_Matrix.png" alt="Confusion Matrix Evaluation metrics" class="asset-zoomed mix-blend-darken opacity-90 scale-[1.3]">
+                    </div>
+                    <h3 class="text-base md:text-lg font-semibold text-[#1D1D1F] mb-2">Empirical Evaluation</h3>
+                    <p class="text-[#6E6E73] text-sm leading-relaxed px-4 max-w-[250px]">Validating the reduction of false positives through confusion matrix analysis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. RESEARCH RESULTS (Academic Metrics) -->
+    <section id="results" class="py-32 md:py-40 bg-[#F5F5F7] px-6 border-t border-gray-200/50" aria-label="Empirical Results">
+        <div class="max-w-6xl mx-auto fade-up">
+            <div class="text-center mb-16 md:mb-20">
+                <h2 class="text-xs md:text-sm uppercase tracking-[0.2em] font-bold text-[#0F766E] mb-4">Empirical Results</h2>
+                <h3 class="text-4xl md:text-6xl font-bold tracking-tighter text-[#1D1D1F] mb-6">Academic Credibility.</h3>
+                <p class="text-lg md:text-xl text-[#6E6E73] font-medium max-w-2xl mx-auto">
+                    The Subject-Dependent CNN-LSTM model delivers balanced performance, proving its viability for reducing alarm fatigue.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+                <div class="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-gray-100 text-center flex flex-col justify-center">
+                    <div class="text-3xl md:text-5xl font-bold text-[#1D1D1F] tracking-tighter mb-2">85<span class="text-xl md:text-2xl text-gray-400">%</span></div>
+                    <div class="text-xs md:text-sm font-semibold text-[#6E6E73] uppercase tracking-wider">Accuracy</div>
+                </div>
+                <div class="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-gray-100 text-center flex flex-col justify-center border-b-4 border-b-[#0F766E]">
+                    <div class="text-3xl md:text-5xl font-bold text-[#0F766E] tracking-tighter mb-2">86<span class="text-xl md:text-2xl text-[#0F766E]/50">%</span></div>
+                    <div class="text-xs md:text-sm font-semibold text-[#6E6E73] uppercase tracking-wider">Weighted F1 Score</div>
+                </div>
+                <div class="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-gray-100 text-center flex flex-col justify-center">
+                    <div class="text-3xl md:text-5xl font-bold text-[#1D1D1F] tracking-tighter mb-2">65<span class="text-xl md:text-2xl text-gray-400">%</span></div>
+                    <div class="text-xs md:text-sm font-semibold text-[#6E6E73] uppercase tracking-wider">Independent Accuracy</div>
+                </div>
+                <div class="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-emerald-100 text-center flex flex-col justify-center bg-emerald-50/30">
+                    <div class="text-3xl md:text-5xl font-bold text-emerald-600 tracking-tighter mb-2">+20<span class="text-xl md:text-2xl text-emerald-600/50">%</span></div>
+                    <div class="text-xs md:text-sm font-semibold text-emerald-700 uppercase tracking-wider">Performance Gain</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 md:p-10 rounded-[32px] md:rounded-[40px] shadow-sm border border-gray-100 flex flex-col lg:flex-row gap-10 items-center">
+                <div class="lg:w-1/2 w-full">
+                    <h4 class="text-xl md:text-2xl font-bold text-[#1D1D1F] mb-4 tracking-tight">Accuracy Comparison</h4>
+                    <p class="text-[#6E6E73] mb-8 text-sm md:text-base leading-relaxed">
+                        Transitioning from a global to a personalized methodology yielded a significant 20 percentage point increase in predictive stability, decisively minimizing False Positives.
+                    </p>
+                    <div class="chart-container h-[250px] md:h-[300px]">
+                        <canvas id="accuracyChart" aria-label="Accuracy comparison bar chart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 w-full flex flex-col items-center justify-center bg-gray-50 rounded-3xl p-6 border border-gray-100">
+                    <div class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">Confusion Matrix Output</div>
+                    <div class="w-full max-w-xs bg-white p-2 rounded-2xl shadow-sm border border-gray-200">
+                        <img src="assets/Confusion_Matrix.png" alt="Confusion Matrix plot depicting reduction in False Positives" class="w-full h-auto object-contain rounded-xl opacity-90">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. RESEARCH IMPACT (Visual Scale) -->
+    <section id="impact" class="py-48 bg-[#0E1117] px-4 mesh-bg text-center">
+        <div class="max-w-6xl mx-auto dark-mode">
+            <h2 class="text-xs uppercase tracking-[0.2em] font-bold text-white/50 mb-12 fade-up">Research Impact</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-20 gap-x-8 text-center fade-up mb-24">
+                <div>
+                    <div class="text-5xl lg:text-7xl font-bold tracking-tighter text-white leading-none mb-4">11.5<span class="text-3xl text-white/50">M+</span></div>
+                    <div class="text-sm font-semibold text-white/60 tracking-wide uppercase">Records Processed</div>
+                </div>
+                <div>
+                    <div class="text-5xl lg:text-7xl font-bold tracking-tighter text-white leading-none mb-4">2.3<span class="text-3xl text-white/50">M+</span></div>
+                    <div class="text-sm font-semibold text-white/60 tracking-wide uppercase">Time-Series Windows</div>
+                </div>
+                <div>
+                    <div class="text-5xl lg:text-7xl font-bold tracking-tighter text-white leading-none mb-4">85<span class="text-3xl opacity-50">%</span></div>
+                    <div class="text-sm font-semibold text-white/60 tracking-wide uppercase">Classification Accuracy</div>
+                </div>
+                <div>
+                    <div class="text-5xl lg:text-7xl font-bold tracking-tighter text-emerald-400 leading-none mb-4">1</div>
+                    <div class="text-sm font-semibold text-emerald-500/80 tracking-wide uppercase">Mission: Reduce Alarm Fatigue</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. DASHBOARD SHOWCASE (Feature Highlights) -->
+    <section id="dashboard" class="py-32 md:py-48 bg-white px-6 relative overflow-hidden border-t border-gray-100" aria-label="Dashboard Experience">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 md:gap-24 relative z-10">
+            <div class="lg:w-1/3 fade-up z-20">
+                <div class="sticky-wrapper">
+                    <h2 class="text-5xl md:text-6xl lg:text-[70px] font-bold tracking-tighter text-[#1D1D1F] mb-8 md:mb-10 leading-[1.0] drop-shadow-sm">
+                        Clarity amidst chaos.
+                    </h2>
+                    <ul class="space-y-6 mb-10">
+                        <li class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E] font-bold shrink-0 text-sm" aria-hidden="true">1</div>
+                            <div><div class="text-[#1D1D1F] font-bold text-lg tracking-tight">Personalized Monitoring</div><div class="text-[#6E6E73] text-sm mt-1">Learns individual physiological baselines.</div></div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E] font-bold shrink-0 text-sm" aria-hidden="true">2</div>
+                            <div><div class="text-[#1D1D1F] font-bold text-lg tracking-tight">Stress Classification</div><div class="text-[#6E6E73] text-sm mt-1">Normal vs High Stress detection.</div></div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E] font-bold shrink-0 text-sm" aria-hidden="true">3</div>
+                            <div><div class="text-[#1D1D1F] font-bold text-lg tracking-tight">Interactive Visualization</div><div class="text-[#6E6E73] text-sm mt-1">Real-time physiological trend exploration.</div></div>
+                        </li>
+                    </ul>
+                    <a href="https://avissproject.streamlit.app/" target="_blank" rel="noopener noreferrer" class="btn-primary w-full shadow-[0_10px_20px_rgba(0,0,0,0.05)]">
+                        Open Deployed Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:w-2/3 fade-up">
+                <!-- Premium Render of Real Dashboard Screenshot -->
+                <div class="bg-[#F5F5F7] p-3 md:p-4 rounded-[32px] md:rounded-[48px] shadow-[0_20px_60px_rgba(0,0,0,0.08)] asset-frame border border-gray-200">
+                    <div class="bg-white rounded-[24px] md:rounded-[40px] overflow-hidden border border-gray-200 asset-content shadow-sm relative h-[500px] md:h-[700px]">
+                        <div class="h-10 md:h-14 bg-gray-50/90 backdrop-blur-md flex items-center px-4 md:px-8 gap-1.5 md:gap-2 border-b border-gray-200 w-full absolute top-0 z-20">
+                            <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-[#FF5F56] border border-black/5"></div>
+                            <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-[#FFBD2E] border border-black/5"></div>
+                            <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full bg-[#27C93F] border border-black/5"></div>
+                            <div class="mx-auto text-[10px] md:text-sm font-semibold text-gray-500 tracking-wide font-mono">avissproject.streamlit.app</div>
+                        </div>
+                        <div class="w-full h-full pt-10 md:pt-14 bg-[#FFFFFF]">
+                            <img src="assets/dashboard_2.png" alt="A-VISS Streamlit Dashboard deployed interface" class="w-full h-full object-cover object-top">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. DASHBOARD SIMULATION (Refactored Streamlit UI with Timeline) -->
+    <section id="simulation" class="py-32 md:py-48 bg-[#F5F5F7] px-4 md:px-6 border-t border-gray-200 relative overflow-hidden" aria-label="Dashboard Simulation">
+        
+        <div class="max-w-7xl mx-auto fade-up relative z-10">
+            <div class="text-center mb-16 md:mb-24 px-4">
+                <h2 class="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter text-[#1D1D1F] mb-4 md:mb-6">Prototype Simulation.</h2>
+                <p class="text-lg md:text-xl lg:text-2xl text-[#6E6E73] font-medium max-w-3xl mx-auto">
+                    A miniature version of the actual A-VISS platform. Watch how physiological stress develops over time.
+                </p>
+            </div>
+
+            <div class="liquid-glass-light p-2 md:p-4 rounded-[32px] md:rounded-[48px] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border border-white w-full max-w-6xl mx-auto asset-frame">
+                
+                <div class="bg-white rounded-[24px] md:rounded-[36px] overflow-hidden flex flex-col lg:flex-row font-sans border border-gray-200 shadow-sm asset-content h-auto lg:h-[700px]">
+                    
+                    <!-- Streamlit Sidebar Mimic (#F0F2F6) -->
+                    <div class="w-full lg:w-80 bg-st-sidebar p-6 md:p-8 flex flex-col shrink-0 border-r border-gray-200 relative z-10">
+                        <div class="font-bold text-st-text text-lg md:text-xl mb-8 md:mb-10 tracking-tight flex items-center gap-3">
+                            <img src="assets/A-VISS.png" alt="A-VISS Logo" class="h-6 md:h-7 w-auto object-contain logo-shadow">
+                            A-VISS
+                        </div>
+                        
+                        <div class="space-y-6 md:space-y-8 flex-grow">
+                            <div class="bg-transparent">
+                                <label for="sim-subject" class="text-[13px] md:text-[14px] text-st-text mb-2 font-medium block">Pilih ID Subjek</label>
+                                <select id="sim-subject" class="w-full bg-white text-st-text text-[14px] md:text-[15px] border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 transition shadow-sm cursor-pointer appearance-none">
+                                    <option>15 (Nurse A)</option>
+                                    <option>08 (Nurse B)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="bg-transparent">
+                                <label for="sim-window" class="text-[13px] md:text-[14px] text-st-text mb-2 font-medium block">Pilih Window Pengamatan</label>
+                                <select id="sim-window" class="w-full bg-white text-st-text text-[14px] md:text-[15px] border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 transition shadow-sm cursor-pointer appearance-none">
+                                    <option>Window 0</option>
+                                </select>
+                            </div>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <div class="text-[11px] font-bold text-blue-800 uppercase tracking-widest mb-1">Model Aktif</div>
+                                <div class="text-xs text-blue-900 font-medium">Binary Subject-Dependent CNN-LSTM</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-6 flex flex-col gap-3 md:gap-4">
+                            <button id="btn-toggle-sim" class="w-full st-secondary-btn py-2.5 rounded-lg text-[14px] md:text-[15px] transition font-medium shadow-sm" aria-live="polite">
+                                Mulai Prediksi
+                            </button>
+                            <button id="btn-inject-stress" class="w-full st-primary-btn py-2.5 rounded-lg text-[14px] md:text-[15px] transition opacity-50 cursor-not-allowed font-medium shadow-sm" disabled>
+                                Trigger Spike (Demo)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Streamlit Content Area (#FFFFFF) -->
+                    <div class="flex-grow p-6 md:p-8 lg:p-12 flex flex-col lg:flex-row gap-8 lg:gap-10 relative bg-white overflow-y-auto">
+                        
+                        <!-- Left Column: Metrics & Charts -->
+                        <div class="flex-grow flex flex-col w-full lg:w-2/3 h-full">
+                            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-st-text tracking-tight mb-6 md:mb-8">Prediksi Tingkat Stres</h1>
+                            
+                            <h2 class="text-lg md:text-xl font-semibold text-st-text mb-4 md:mb-6 border-b border-gray-100 pb-2">Hasil Prediksi</h2>
+                            
+                            <!-- Streamlit Success/Error Alert Mimic -->
+                            <div id="dash-status" class="w-full p-4 rounded-lg font-medium text-[14px] md:text-[16px] mb-6 md:mb-8 bg-[#F0F2F6] text-st-text border border-gray-200 transition-colors duration-300 flex items-center gap-3" aria-live="polite">
+                                <span id="status-icon" class="text-xl" aria-hidden="true">ℹ️</span> Sistem siap. Tekan 'Mulai Prediksi'.
+                            </div>
+
+                            <!-- Streamlit Columns (Metrics) Mimic -->
+                            <div class="grid grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-10">
+                                <div class="flex flex-col">
+                                    <div class="text-xs md:text-sm text-gray-500 mb-1">Stress Score</div>
+                                    <div class="text-3xl md:text-4xl font-normal text-st-text" id="dash-score">0.0%</div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="text-xs md:text-sm text-gray-500 mb-1">Window Pengamatan</div>
+                                    <div class="text-3xl md:text-4xl font-normal text-st-text">0</div>
+                                </div>
+                            </div>
+
+                            <!-- Streamlit Chart Area Mimic -->
+                            <div class="flex-grow flex flex-col relative w-full min-h-[200px]">
+                                <div class="text-sm text-st-text mb-2 font-semibold">Sinyal Fisiologis Terstandarisasi (Z-Score)</div>
+                                <div class="chart-container w-full h-full relative">
+                                    <canvas id="simChart" aria-label="Interactive simulation chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Prediction Timeline Log -->
+                        <div class="hidden lg:flex flex-col w-1/3 h-full border-l border-gray-100 pl-8">
+                            <h3 class="text-lg font-semibold text-st-text mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse hidden" id="log-recording-dot"></span>
+                                Prediction Event Log
+                            </h3>
+                            <div id="prediction-log" class="flex-grow overflow-y-auto space-y-3 pr-2 flex flex-col justify-start" aria-live="polite">
+                                <div class="text-sm text-gray-400 italic">Waiting for inference to start...</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. TECHNOLOGY STACK & FINAL CTA (Including Thesis) -->
+    <section class="py-32 md:py-48 bg-white px-6 border-t border-gray-100 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto text-center fade-up relative z-10">
+            
+            <!-- Technology Stack -->
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4 mb-32">
+                <span class="px-4 md:px-6 py-2 md:py-2.5 bg-[#F5F5F7] rounded-full text-xs md:text-sm font-semibold text-[#1D1D1F] border border-gray-200 shadow-sm cursor-default hover:bg-gray-100 transition">Python</span>
+                <span class="px-4 md:px-6 py-2 md:py-2.5 bg-[#F5F5F7] rounded-full text-xs md:text-sm font-semibold text-[#1D1D1F] border border-gray-200 shadow-sm cursor-default hover:bg-gray-100 transition">TensorFlow</span>
+                <span class="px-4 md:px-6 py-2 md:py-2.5 bg-[#F5F5F7] rounded-full text-xs md:text-sm font-semibold text-[#1D1D1F] border border-gray-200 shadow-sm cursor-default hover:bg-gray-100 transition">Scikit-Learn</span>
+                <span class="px-4 md:px-6 py-2 md:py-2.5 bg-[#F5F5F7] rounded-full text-xs md:text-sm font-semibold text-[#1D1D1F] border border-gray-200 shadow-sm cursor-default hover:bg-gray-100 transition">Streamlit</span>
+            </div>
+
+            <!-- Official Product Signature -->
+            <div class="flex flex-col items-center justify-center mb-16 relative">
+                <!-- Subtle Teal Ambient Glow Behind Logo -->
+                <div class="absolute inset-0 bg-[#0F766E] blur-[80px] opacity-15 w-40 h-40 rounded-full mx-auto pointer-events-none transform -translate-y-4"></div>
+                
+                <img src="assets/A-VISS.png" alt="A-VISS Official Logo" class="h-16 md:h-24 w-auto object-contain relative z-10 drop-shadow-xl mb-6">
+                <h3 class="text-3xl md:text-4xl font-bold text-[#1D1D1F] tracking-tight mb-2">A-VISS</h3>
+                <p class="text-base md:text-lg text-[#6E6E73] font-medium">Automated Vital Intelligence for Stress Surveillance</p>
+            </div>
+
+            <!-- Signature Research Tagline -->
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter text-[#1D1D1F] mb-16 leading-[1.05]">
+                Built for Research.<br class="hidden sm:block"> Designed for Real-World Monitoring.
+            </h2>
+
+            <!-- Enhanced CTA with Thesis Foundation -->
+            <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4 md:gap-5 w-full px-4">
+                <a href="https://avissproject.streamlit.app/" target="_blank" rel="noopener noreferrer" class="btn-primary shadow-xl w-full sm:w-auto">Open Deployed Dashboard</a>
+                <a href="Draft Skripsi-Jonathan Kwan.pdf" download class="bg-[#F5F5F7] text-[#1D1D1F] border border-gray-200 rounded-full px-6 py-3.5 md:py-4 font-medium text-base md:text-[17px] hover:bg-gray-100 transition flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Read Thesis Document
+                </a>
+                <a href="https://github.com/Jnxx02/AVISS_Project" target="_blank" rel="noopener noreferrer" class="btn-secondary w-full sm:w-auto">View Source Code</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. CLOSING -->
+    <section id="closing" class="py-40 md:py-48 bg-[#0E1117] text-center px-6 relative overflow-hidden">
+        <div class="ambient-glow-teal top-[20%] right-[-10%] opacity-40"></div>
+        <div class="max-w-5xl mx-auto fade-up relative z-10 dark-mode">
+            
+            <div class="max-w-4xl mx-auto bg-white/5 backdrop-blur-2xl rounded-[32px] p-8 md:p-12 text-center border border-white/10 shadow-2xl asset-frame">
+                <div class="text-xs font-bold uppercase text-teal-400 tracking-widest mb-4">Academic Research Foundation</div>
+                <h3 class="text-lg md:text-xl font-bold text-white mb-8">"Rancang Bangun Prototype A-VISS untuk Klasifikasi Stres Perawat Menggunakan Pendekatan Subject-Dependent CNN-LSTM"</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                    <div><div class="text-gray-500 mb-1 uppercase text-[10px] tracking-widest font-bold">Author</div><div class="font-semibold text-white">Jonathan Kwan</div></div>
+                    <div><div class="text-gray-500 mb-1 uppercase text-[10px] tracking-widest font-bold">Supervisor</div><div class="font-semibold text-white">Octavian, S.Si., M.Kom.</div></div>
+                    <div><div class="text-gray-500 mb-1 uppercase text-[10px] tracking-widest font-bold">Institution</div><div class="font-semibold text-white">Universitas Hasanuddin</div></div>
+                    <div><div class="text-gray-500 mb-1 uppercase text-[10px] tracking-widest font-bold">Year</div><div class="font-semibold text-white">2026</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#F5F5F7] border-t border-gray-200 py-16 md:py-20 text-center text-[#6E6E73] text-[14px] md:text-[15px] px-6">
+        <div class="max-w-4xl mx-auto flex flex-col items-center">
+            <img src="assets/A-VISS.png" alt="A-VISS Minimal Logo" class="h-8 md:h-10 w-auto object-contain mb-5 logo-shadow opacity-90">
+            <div class="font-bold text-[#1D1D1F] text-lg md:text-xl mb-1">A-VISS Prototype 1.0</div>
+            <p class="text-[#6E6E73] font-semibold text-xs md:text-sm uppercase tracking-widest mb-8">Automated Vital Intelligence for Stress Surveillance</p>
+            
+            <p class="mb-6 font-medium text-gray-500">Information Systems Program, Universitas Hasanuddin &copy; 2026.</p>
+            <p class="text-xs md:text-sm max-w-xl mx-auto opacity-60 leading-relaxed text-gray-500">This landing page and accompanying dashboard are part of an academic thesis defense. Data utilized is secondary proxy data. Not intended for actual medical diagnosis.</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC -->
+    <script>
+        // Adjust Navbar styling based on dark/light sections (Optimized & Cleaned)
+        const navbar = document.getElementById('nav-container');
+        const navCapsule = document.querySelector('.nav-capsule');
+        // Accurate mapped dark section IDs
+        const darkSections = ['human', 'wow', 'impact', 'closing'];
+        
+        window.addEventListener('scroll', () => {
+            let isDark = false;
+            darkSections.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    const rect = el.getBoundingClientRect();
+                    // If navbar is over the dark section
+                    if(rect.top <= 80 && rect.bottom >= 80) {
+                        isDark = true;
+                    }
+                }
+            });
+
+            if(isDark) {
+                document.body.classList.add('dark-mode');
+                navCapsule.classList.replace('bg-white/75', 'bg-black/50');
+                const textElements = navCapsule.querySelectorAll('.nav-text');
+                textElements.forEach(el => {
+                    el.classList.replace('text-[#1D1D1F]', 'text-white');
+                });
+                const btn = navCapsule.querySelector('.nav-btn');
+                btn.classList.replace('bg-black/5', 'bg-white/10');
+                btn.classList.replace('text-[#1D1D1F]', 'text-white');
+                btn.classList.replace('border-black/10', 'border-white/20');
+            } else {
+                document.body.classList.remove('dark-mode');
+                navCapsule.classList.replace('bg-black/50', 'bg-white/75');
+                const textElements = navCapsule.querySelectorAll('.nav-text');
+                textElements.forEach(el => {
+                    el.classList.replace('text-white', 'text-[#1D1D1F]');
+                });
+                const btn = navCapsule.querySelector('.nav-btn');
+                btn.classList.replace('bg-white/10', 'bg-black/5');
+                btn.classList.replace('text-white', 'text-[#1D1D1F]');
+                btn.classList.replace('border-white/20', 'border-black/10');
+            }
+        });
+
+        // Optimized Scroll Reveal Utility using IntersectionObserver
+        document.addEventListener("DOMContentLoaded", function() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // Unobserve to improve scroll performance
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-up, .scale-in').forEach((element) => {
+                observer.observe(element);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Chart Defaults
+            Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+            Chart.defaults.color = '#6E6E73';
+
+            // Accuracy Chart (85% Accuracy & 65% Independent)
+            const ctxAcc = document.getElementById('accuracyChart');
+            if(ctxAcc) {
+                new Chart(ctxAcc.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Multiclass (Ind.)', 'Multiclass (Dep.)', 'Binary (Ind.)', 'Binary (Dep.)'],
+                        datasets: [{
+                            label: 'Accuracy (%)',
+                            data: [54, 79, 65, 85], 
+                            backgroundColor: ['#E3E3E8', '#D2D2D7', '#86868B', '#0F766E'],
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1D1D1F',
+                                padding: 12,
+                                titleFont: { size: 13, weight: '600' },
+                                bodyFont: { size: 13 },
+                                cornerRadius: 8,
+                                callbacks: { label: (c) => ` Accuracy: ${c.raw}%` }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, max: 100, grid: { color: '#F5F5F7' }, border: {display: false} },
+                            x: { grid: { display: false }, border: {display: false}, ticks: { font: { weight: '600', size: 11 } } }
+                        }
+                    }
+                });
+            }
+
+            // Streamlit-style Live Simulation Chart
+            const ctxSim = document.getElementById('simChart');
+            if(!ctxSim) return;
+            
+            const dataLen = 40;
+            let simDataHR = Array(dataLen).fill(0); // Z-score around 0
+            let simDataEDA = Array(dataLen).fill(0); // Z-score around 0
+            let simLabels = Array.from({length: dataLen}, (_, i) => i);
+            
+            const simChart = new Chart(ctxSim.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: simLabels,
+                    datasets: [
+                        {
+                            label: 'HR (Z-Score)',
+                            data: simDataHR,
+                            borderColor: '#FF4B4B', 
+                            backgroundColor: 'rgba(255, 75, 75, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'EDA (Z-Score)',
+                            data: simDataEDA,
+                            borderColor: '#0068C9', 
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 }, 
+                    plugins: { legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 12, font: {size: 11} } }, tooltip: { enabled: false } },
+                    scales: {
+                        y: { min: -2, max: 3, grid: { color: 'rgba(0,0,0,0.05)' }, border: {display: false}, ticks: { color: '#6E6E73', font: {size: 10} } },
+                        x: { display: false, border: {display: false} }
+                    }
+                }
+            });
+
+            // Simulation State Logic with Timeline
+            let isSimRunning = false;
+            let isStressed = false;
+            let simTimer;
+            const baseHR_Z = 0.0;
+            const baseEDA_Z = 0.0;
+
+            const btnToggleSim = document.getElementById('btn-toggle-sim');
+            const btnInjectStress = document.getElementById('btn-inject-stress');
+            const valScore = document.getElementById('dash-score');
+            const dashStatus = document.getElementById('dash-status');
+            const logContainer = document.getElementById('prediction-log');
+            const recordingDot = document.getElementById('log-recording-dot');
+            
+            // Format time helper
+            function getCurrentTime() {
+                const now = new Date();
+                return now.toLocaleTimeString([], { hour12: false });
+            }
+
+            if(btnToggleSim) {
+                btnToggleSim.addEventListener('click', () => {
+                    if (!isSimRunning) {
+                        // Turn ON
+                        isSimRunning = true;
+                        btnToggleSim.textContent = 'Hentikan Prediksi';
+                        btnToggleSim.classList.replace('st-secondary-btn', 'st-primary-btn');
+                        btnToggleSim.classList.replace('text-[#31333F]', 'text-white');
+                        
+                        btnInjectStress.disabled = false;
+                        btnInjectStress.classList.remove('opacity-50', 'cursor-not-allowed');
+                        
+                        if(recordingDot) recordingDot.classList.remove('hidden');
+
+                        if (logContainer && logContainer.innerHTML.includes('Waiting for')) {
+                            logContainer.innerHTML = '';
+                        }
+
+                        if(logContainer) {
+                            const startLog = document.createElement('div');
+                            startLog.className = 'text-xs text-gray-400 italic mb-2';
+                            startLog.textContent = `[${getCurrentTime()}] Proses inferensi dimulai...`;
+                            logContainer.appendChild(startLog);
+                        }
+
+                        simTimer = setInterval(() => {
+                            let nextHrZ, nextEdaZ, score;
+                            const timeString = getCurrentTime();
+                            
+                            if (isStressed) {
+                                nextHrZ = 1.5 + (Math.random() * 1.0);
+                                nextEdaZ = 1.2 + (Math.random() * 0.8);
+                                score = 75.0 + Math.random() * 20.0; 
+                                
+                                dashStatus.className = 'w-full p-4 rounded-lg font-medium text-[14px] md:text-[16px] mb-6 md:mb-8 transition-colors duration-300 flex items-center gap-3 st-error shadow-sm';
+                                dashStatus.innerHTML = '<span class="text-xl" aria-hidden="true">🚨</span> Tingkat Stres Tinggi (HIGH STRESS)';
+                                
+                                if(logContainer) {
+                                    const logEntry = document.createElement('div');
+                                    logEntry.className = 'flex justify-between items-center p-3 rounded-xl bg-[#F8D7DA]/50 border border-[#F5C6CB] text-sm transition-all';
+                                    logEntry.innerHTML = `<span class="text-gray-500 font-mono text-xs w-16">${timeString}</span> <span class="font-bold text-[#721C24] flex-grow text-center text-xs md:text-sm">HIGH STRESS</span> <span class="text-[#721C24] font-mono font-bold text-xs w-16 text-right">${score.toFixed(1)}%</span>`;
+                                    logContainer.appendChild(logEntry);
+                                }
+                                
+                            } else {
+                                nextHrZ = baseHR_Z + (Math.random() * 0.4 - 0.2);
+                                nextEdaZ = baseEDA_Z + (Math.random() * 0.4 - 0.2); 
+                                score = 15.0 + Math.random() * 15.0; 
+                                
+                                dashStatus.className = 'w-full p-4 rounded-lg font-medium text-[14px] md:text-[16px] mb-6 md:mb-8 transition-colors duration-300 flex items-center gap-3 st-success shadow-sm';
+                                dashStatus.innerHTML = '<span class="text-xl" aria-hidden="true">✅</span> Status: NORMAL';
+
+                                if(logContainer) {
+                                    const logEntry = document.createElement('div');
+                                    logEntry.className = 'flex justify-between items-center p-3 rounded-xl bg-[#D4EDDA]/50 border border-[#C3E6CB] text-sm';
+                                    logEntry.innerHTML = `<span class="text-gray-500 font-mono text-xs w-16">${timeString}</span> <span class="font-bold text-[#155724] flex-grow text-center text-xs md:text-sm">NORMAL</span> <span class="text-[#155724] font-mono font-bold text-xs w-16 text-right">${score.toFixed(1)}%</span>`;
+                                    logContainer.appendChild(logEntry);
+                                }
+                            }
+
+                            // Keep log length manageable
+                            if(logContainer && logContainer.children.length > 20) {
+                                logContainer.removeChild(logContainer.firstChild);
+                            }
+                            
+                            if(logContainer) logContainer.scrollTop = logContainer.scrollHeight;
+
+                            valScore.textContent = score.toFixed(1) + "%";
+
+                            simDataHR.push(nextHrZ);
+                            simDataHR.shift();
+                            simDataEDA.push(nextEdaZ);
+                            simDataEDA.shift();
+                            
+                            simChart.update();
+
+                        }, 2000); 
+
+                    } else {
+                        // Turn OFF
+                        isSimRunning = false;
+                        isStressed = false;
+                        clearInterval(simTimer);
+                        
+                        btnToggleSim.textContent = 'Mulai Prediksi';
+                        btnToggleSim.classList.replace('st-primary-btn', 'st-secondary-btn');
+                        btnToggleSim.classList.replace('text-white', 'text-[#31333F]');
+                        
+                        btnInjectStress.disabled = true;
+                        btnInjectStress.classList.add('opacity-50', 'cursor-not-allowed');
+                        
+                        if(recordingDot) recordingDot.classList.add('hidden');
+
+                        valScore.textContent = '0.0%';
+                        
+                        dashStatus.className = 'w-full p-4 rounded-lg font-medium text-[14px] md:text-[16px] mb-6 md:mb-8 bg-[#F0F2F6] text-st-text border border-gray-200 transition-colors duration-300 flex items-center gap-3';
+                        dashStatus.innerHTML = '<span class="text-xl" aria-hidden="true">ℹ️</span> Sistem siap. Tekan \'Mulai Prediksi\'.';
+                        
+                        if(logContainer) {
+                            const stopLog = document.createElement('div');
+                            stopLog.className = 'text-xs text-gray-400 italic mt-2';
+                            stopLog.textContent = `[${getCurrentTime()}] Inferensi dihentikan.`;
+                            logContainer.appendChild(stopLog);
+                            logContainer.scrollTop = logContainer.scrollHeight;
+                        }
+                    }
+                });
+            }
+
+            if(btnInjectStress) {
+                btnInjectStress.addEventListener('click', () => {
+                    if(!isStressed && isSimRunning) {
+                        isStressed = true;
+                        btnInjectStress.textContent = "Merekam Lonjakan...";
+                        
+                        if(logContainer) {
+                            const triggerLog = document.createElement('div');
+                            triggerLog.className = 'text-xs text-[#FF4B4B] italic my-1 text-center font-medium';
+                            triggerLog.textContent = `— Lonjakan Stres Disimulasikan —`;
+                            logContainer.appendChild(triggerLog);
+                            logContainer.scrollTop = logContainer.scrollHeight;
+                        }
+                        
+                        setTimeout(() => {
+                            isStressed = false;
+                            btnInjectStress.textContent = "Trigger Spike (Demo)";
+                            
+                            if(logContainer) {
+                                const recoverLog = document.createElement('div');
+                                recoverLog.className = 'text-xs text-emerald-600 italic my-1 text-center font-medium';
+                                recoverLog.textContent = `— Pemulihan ke Baseline —`;
+                                logContainer.appendChild(recoverLog);
+                                logContainer.scrollTop = logContainer.scrollHeight;
+                            }
+
+                        }, 6000);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
